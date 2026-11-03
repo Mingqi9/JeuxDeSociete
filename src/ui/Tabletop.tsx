@@ -31,7 +31,7 @@ export function Tabletop({
   const pending = game.pending,
     locked = !enabled || (!!pending && pending.kind !== "draw");
   return (
-    <div className="tabletop">
+    <div className={`tabletop ${game.phase === "setup" ? "setup-table" : ""}`}>
       <aside className="table-left">
         {sidebar}
         <details className="scoring-help">
@@ -68,62 +68,66 @@ export function Tabletop({
         t={t}
         preview={preview}
       />
-      <aside className="deck-rail" aria-label={t.market}>
-        <button
-          className="card-back ticket-deck"
-          aria-label={`${t.drawTickets} (${game.ticketCount})`}
-          disabled={!enabled || !!pending || !game.ticketCount}
-          onClick={() => dispatch({ type: "drawTickets" })}
-        >
-          <span className="deck-emblem" aria-hidden="true">
-            ◇
-          </span>
-          <strong>{t.destinationDeck}</strong>
-          <span>{game.ticketCount}</span>
-        </button>
-        <button
-          className="card-back train-deck"
-          aria-label={t.blind}
-          disabled={locked || game.deckCount + game.discardCount === 0}
-          onClick={() => dispatch({ type: "drawCard", source: "blind" })}
-        >
-          <span className="deck-emblem" aria-hidden="true">
-            ═╪═
-          </span>
-          <strong>{t.trainDeck}</strong>
-          <span>
-            {game.deckCount} {t.remaining}
-          </span>
-        </button>
-        <div className="market">
-          <h2>{t.market}</h2>
-          {game.market.map((card, i) => (
-            <TrainCard
-              key={i}
-              card={card}
-              t={t}
-              disabled={locked || (pending?.kind === "draw" && card === "wild")}
-              onClick={() => dispatch({ type: "drawCard", source: i })}
-            />
-          ))}
-        </div>
-        <div
-          className="discard-stack"
-          aria-label={`${t.discardPile} (${game.discardCount})`}
-        >
-          {game.discardCount > 0 ? (
-            <TrainArt card={game.discardTop!} />
-          ) : (
-            <span className="empty-discard" aria-hidden="true">
-              ↻
+      {game.phase !== "setup" && (
+        <aside className="deck-rail" aria-label={t.market}>
+          <button
+            className="card-back ticket-deck"
+            aria-label={`${t.drawTickets} (${game.ticketCount})`}
+            disabled={!enabled || !!pending || !game.ticketCount}
+            onClick={() => dispatch({ type: "drawTickets" })}
+          >
+            <span className="deck-emblem" aria-hidden="true">
+              ◇
             </span>
-          )}
-          <small>
-            {t.discardPile} · {game.discardCount}
-          </small>
-        </div>
-        <p className="market-hint">{t.marketRule}</p>
-      </aside>
+            <strong>{t.destinationDeck}</strong>
+            <span>{game.ticketCount}</span>
+          </button>
+          <button
+            className="card-back train-deck"
+            aria-label={t.blind}
+            disabled={locked || game.deckCount + game.discardCount === 0}
+            onClick={() => dispatch({ type: "drawCard", source: "blind" })}
+          >
+            <span className="deck-emblem" aria-hidden="true">
+              ═╪═
+            </span>
+            <strong>{t.trainDeck}</strong>
+            <span>
+              {game.deckCount} {t.remaining}
+            </span>
+          </button>
+          <div className="market">
+            <h2>{t.market}</h2>
+            {game.market.map((card, i) => (
+              <TrainCard
+                key={i}
+                card={card}
+                t={t}
+                disabled={
+                  locked || (pending?.kind === "draw" && card === "wild")
+                }
+                onClick={() => dispatch({ type: "drawCard", source: i })}
+              />
+            ))}
+          </div>
+          <div
+            className="discard-stack"
+            aria-label={`${t.discardPile} (${game.discardCount})`}
+          >
+            {game.discardCount > 0 ? (
+              <TrainArt card={game.discardTop!} />
+            ) : (
+              <span className="empty-discard" aria-hidden="true">
+                ↻
+              </span>
+            )}
+            <small>
+              {t.discardPile} · {game.discardCount}
+            </small>
+          </div>
+          <p className="market-hint">{t.marketRule}</p>
+        </aside>
+      )}
     </div>
   );
 }

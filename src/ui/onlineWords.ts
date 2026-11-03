@@ -1,6 +1,14 @@
 import type { Lang } from "./i18n";
 const zh = {
   online: "远程联机",
+  sortCards: "按颜色排序",
+  reorderHint: "拖拽调整顺序；键盘 Alt + 左右键也可移动。",
+  soundOn: "音效：开",
+  soundOff: "音效：关",
+  archive: "标记完成并收藏",
+  unarchive: "移回任务",
+  collection: "旅行收藏夹",
+  collectionHint: "收藏是个人标记，不改变任务计分；最终由服务器结算。",
   local: "返回本地游戏",
   nickname: "你的昵称",
   roomId: "房间代码",
@@ -58,6 +66,16 @@ const zh = {
 };
 const fr = {
   online: "Jouer à distance",
+  sortCards: "Trier par couleur",
+  reorderHint:
+    "Glissez pour trier ; Alt + flèches déplace une carte au clavier.",
+  soundOn: "Son : activé",
+  soundOff: "Son : coupé",
+  archive: "Marquer terminé et classer",
+  unarchive: "Remettre dans les destinations",
+  collection: "Collection de voyages",
+  collectionHint:
+    "Classement personnel sans effet sur le score, calculé par le serveur.",
   local: "Jeu local",
   nickname: "Votre pseudo",
   roomId: "Code de la salle",

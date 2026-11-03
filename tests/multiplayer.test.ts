@@ -48,6 +48,37 @@ async function cmd(auth: Credentials, command: Command["command"]) {
   });
 }
 describe("authoritative multiplayer", () => {
+  it("accepts independent simultaneous setup choices and hides other offers", async () => {
+    const auth = await setup();
+    await cmd(auth[0], { type: "start" });
+    const views = await Promise.all(auth.map((a) => rooms.read(a)));
+    const commands: Command[] = views.map((view) => {
+      const offer = view.table!.pending;
+      if (offer?.kind !== "tickets") throw Error("No private offer");
+      return {
+        id: randomUUID(),
+        version: view.version,
+        command: {
+          type: "action",
+          action: {
+            type: "keepTickets",
+            ids: offer.tickets.slice(0, 2).map((t) => t.id),
+          },
+        },
+      };
+    });
+    await expect(rooms.command(auth[1], commands[0])).rejects.toThrow(
+      "INVALID_TICKETS",
+    );
+    await Promise.all([
+      rooms.command(auth[1], commands[1]),
+      rooms.command(auth[0], commands[0]),
+    ]);
+    const final = await rooms.read(auth[0]);
+    expect(final.table!.phase).toBe("playing");
+    expect(final.table!.active).toBe(0);
+    expect(final.self!.tickets).toHaveLength(2);
+  });
   it("supports 2-5 seats, unique colors, host-only start, idempotent admission and private projection", async () => {
     const auth = await setup(5),
       room = await rooms.read(auth[0]);
@@ -76,7 +107,7 @@ describe("authoritative multiplayer", () => {
         expect(player).not.toHaveProperty("tickets");
       }
       expect(JSON.stringify(view)).not.toContain("tokenHash");
-      if (i > 0) expect(view.table!.pending).toBeNull();
+      expect(view.table!.pending?.kind).toBe("tickets");
     }
     await expect(rooms.read({ ...auth[0], token: token() })).rejects.toThrow(
       "UNAUTHORIZED",

@@ -1,6 +1,7 @@
 export const dictionaries = {
   zh: {
     fitWidth: "铺满宽度",
+    fitMap: "完整地图",
     mapActionHint:
       "拖动车厢到线路、车站到城市，或直接点选地图目标。再选择手牌并确认支付。",
     wagonTool: "放置车厢",
@@ -163,6 +164,7 @@ export const dictionaries = {
   },
   fr: {
     fitWidth: "Pleine largeur",
+    fitMap: "Carte entière",
     mapActionHint:
       "Glissez un wagon sur une route ou une gare sur une ville, ou touchez directement la cible. Choisissez ensuite vos cartes et confirmez.",
     wagonTool: "Placer des wagons",

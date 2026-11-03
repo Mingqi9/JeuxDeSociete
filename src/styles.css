@@ -424,9 +424,50 @@ select {
   width: 90px;
 }
 .map-scroll {
-  overflow: auto;
+  overflow: scroll;
+  scrollbar-gutter: stable;
+  overflow-anchor: none;
+  cursor: grab;
+  user-select: none;
   touch-action: pan-x pan-y;
   max-height: 1000px;
+}
+.map-scroll:active {
+  cursor: grabbing;
+}
+.hand-slot {
+  min-width: 0;
+  position: relative;
+}
+.hand-slot .train-card {
+  width: 100%;
+}
+.card-drag-handle {
+  display: block;
+  text-align: center;
+  cursor: grab;
+  touch-action: none;
+  background: #e8dfc9;
+  border-radius: 4px;
+}
+.sound-toggle {
+  align-self: flex-end;
+  font-size: 11px;
+  padding: 3px 8px;
+}
+.travel-collection {
+  margin-top: 12px;
+}
+.live-table .tabletop.setup-table {
+  grid-template-columns: minmax(300px, 38%) minmax(0, 1fr);
+  grid-template-areas: "bonus board";
+}
+@media (max-width: 760px) {
+  .live-table .tabletop.setup-table {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1.2fr);
+    grid-template-areas: "board" "bonus";
+  }
 }
 .map-scroll svg {
   display: block;

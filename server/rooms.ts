@@ -101,7 +101,23 @@ export class Rooms {
             ticketCount: g.ticketDeck.length,
             discardCount: g.discard.length,
             discardTop: g.discard.at(-1) ?? null,
-            pending: g.players[g.active].id === seat.id ? g.pending : null,
+            pending:
+              g.phase === "setup"
+                ? g.initialOffers[g.players.findIndex((p) => p.id === seat.id)]
+                    ?.length
+                  ? {
+                      kind: "tickets",
+                      tickets:
+                        g.initialOffers[
+                          g.players.findIndex((p) => p.id === seat.id)
+                        ],
+                      minimum: 2,
+                      initial: true,
+                    }
+                  : null
+                : g.players[g.active].id === seat.id
+                  ? g.pending
+                  : null,
           }
         : null,
       self: g?.players.find((p) => p.id === seat.id) ?? null,
@@ -192,7 +208,15 @@ export class Rooms {
         requireRule(prior.rows[0].fingerprint === fingerprint, "ID_REUSED");
         return this.view(room, seat);
       }
-      requireRule(a.version === room.version, "STALE_VERSION");
+      const independentSetup =
+        room.game?.phase === "setup" &&
+        a.command.type === "action" &&
+        a.command.action.type === "keepTickets";
+      requireRule(
+        a.version === room.version ||
+          (independentSetup && a.version <= room.version),
+        "STALE_VERSION",
+      );
       const c = a.command;
       if (c.type === "start") {
         requireRule(room.host === seat.id, "HOST_ONLY");

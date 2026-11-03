@@ -213,9 +213,25 @@ export function transition(
   requireRule(parsed.success, "INVALID_ACTION");
   const a = parsed.data;
   requireRule(state.phase !== "finished", "GAME_OVER");
-  requireRule(state.players[state.active].id === actor, "NOT_YOUR_TURN");
+  const setupChoice = state.phase === "setup" && a.type === "keepTickets";
+  const actorIndex = state.players.findIndex((p) => p.id === actor);
+  requireRule(actorIndex >= 0, "NOT_YOUR_TURN");
+  requireRule(
+    setupChoice || state.players[state.active].id === actor,
+    "NOT_YOUR_TURN",
+  );
   const g = structuredClone(state);
   if (randomSource) randomSources.set(g, randomSource);
+  if (setupChoice) {
+    requireRule(g.initialOffers[actorIndex]?.length, "WRONG_PHASE");
+    g.active = actorIndex;
+    g.pending = {
+      kind: "tickets",
+      tickets: g.initialOffers[actorIndex],
+      minimum: 2,
+      initial: true,
+    };
+  }
   const p = player(g);
   if (a.type === "keepTickets") {
     requireRule(g.pending?.kind === "tickets", "WRONG_PHASE");
@@ -234,8 +250,8 @@ export function transition(
       g.ticketDeck.push(...offer.tickets.filter((t) => !ids.has(t.id)));
     if (offer.initial) {
       g.initialOffers[g.active] = [];
-      g.active++;
-      if (g.active === g.players.length) {
+      g.active = g.initialOffers.findIndex((offer) => offer.length > 0);
+      if (g.active === -1) {
         g.active = 0;
         g.phase = "playing";
         g.initialOffers = [];

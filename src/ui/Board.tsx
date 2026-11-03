@@ -46,10 +46,24 @@ export function Board({
     y: number;
   } | null>(null);
   const player = game.players[game.active];
+  const [inspection, setInspection] = useState("");
+  const pan = useRef<{
+    x: number;
+    y: number;
+    left: number;
+    top: number;
+    moved: boolean;
+  } | null>(null);
+  const suppressClick = useRef(false);
   const chooseRoute = (id: string) => {
+    const r = game.data.routes.find((r) => r.id === id)!;
+    setInspection(
+      `${r.a} ? ${r.b} ? ${r.length} ? ${t[r.color]}${r.tunnel ? " ? " + t.tunnel : ""}${r.locomotives ? " ? ? " + r.locomotives : ""}`,
+    );
     if (enabled) onSelect(id);
   };
   const chooseCity = (city: string) => {
+    setInspection(city);
     if (enabled) onSelectCity(city);
   };
   useEffect(() => {
@@ -62,7 +76,11 @@ export function Board({
     const el = viewport.current;
     if (!el) return;
     const observer = new ResizeObserver(() =>
-      setViewportSize({ width: el.clientWidth, height: el.clientHeight }),
+      setViewportSize((old) =>
+        old.width === el.clientWidth && old.height === el.clientHeight
+          ? old
+          : { width: el.clientWidth, height: el.clientHeight },
+      ),
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -130,7 +148,7 @@ export function Board({
       Math.max(0.2, Math.min(1, el.clientHeight / h / (el.clientWidth / w))),
     );
     el.scrollTo({ left: 0, top: 0 });
-  }, [preview, w, h]);
+  }, [preview?.id, w, h]);
   return (
     <section className="map-panel" aria-label={t.fixture}>
       {enabled && (
@@ -216,6 +234,16 @@ export function Board({
         >
           {t.fitWidth}
         </button>
+        <button
+          onClick={() => {
+            setZoom(
+              Math.max(0.2, Math.min(1, viewportSize.height / h / widthScale)),
+            );
+            viewport.current?.scrollTo({ left: 0, top: 0 });
+          }}
+        >
+          {t.fitMap}
+        </button>
         <label>
           {t.zoom}{" "}
           <input
@@ -229,7 +257,50 @@ export function Board({
           />
         </label>
       </div>
-      <div className="map-scroll" ref={viewport}>
+      <div
+        className="map-scroll"
+        ref={viewport}
+        onPointerDown={(e) => {
+          if (e.button !== 0 || e.pointerType !== "mouse") return;
+          suppressClick.current = false;
+          pan.current = {
+            x: e.clientX,
+            y: e.clientY,
+            left: e.currentTarget.scrollLeft,
+            top: e.currentTarget.scrollTop,
+            moved: false,
+          };
+        }}
+        onPointerMove={(e) => {
+          const p = pan.current;
+          if (!p) return;
+          const dx = e.clientX - p.x,
+            dy = e.clientY - p.y;
+          if (Math.hypot(dx, dy) > 4) {
+            p.moved = true;
+            e.currentTarget.setPointerCapture(e.pointerId);
+          }
+          if (p.moved) {
+            e.currentTarget.scrollLeft = p.left - dx;
+            e.currentTarget.scrollTop = p.top - dy;
+          }
+        }}
+        onPointerUp={(e) => {
+          suppressClick.current = !!pan.current?.moved;
+          pan.current = null;
+          if (e.currentTarget.hasPointerCapture(e.pointerId))
+            e.currentTarget.releasePointerCapture(e.pointerId);
+        }}
+        onPointerCancel={() => {
+          pan.current = null;
+        }}
+        onClickCapture={(e) => {
+          if (suppressClick.current) {
+            e.stopPropagation();
+            suppressClick.current = false;
+          }
+        }}
+      >
         <svg
           width={w * mapScale}
           height={h * mapScale}
@@ -303,8 +374,7 @@ export function Board({
                   data-route={r.id}
                   data-owner={owner?.id}
                   role="button"
-                  tabIndex={enabled ? 0 : -1}
-                  aria-disabled={!enabled}
+                  tabIndex={0}
                   aria-pressed={selected === r.id}
                   aria-label={`${r.a} – ${r.b}, ${r.length}, ${t[r.color]}, ${owner?.name ?? t.unclaimed}`}
                   onClick={() => chooseRoute(r.id)}
@@ -402,8 +472,7 @@ export function Board({
                   key={city}
                   data-city={city}
                   role="button"
-                  tabIndex={enabled ? 0 : -1}
-                  aria-disabled={!enabled}
+                  tabIndex={0}
                   aria-label={`${t.station} · ${city}${owner ? ` · ${owner.name}` : ""}`}
                   aria-pressed={selectedCity === city}
                   onClick={() => chooseCity(city)}
@@ -596,7 +665,7 @@ export function Board({
         </svg>
       </div>
       <div className="map-caption">
-        {t.inspectMap}
+        {inspection || t.inspectMap}
         {preview && (
           <strong>
             {" "}

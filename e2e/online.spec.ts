@@ -28,13 +28,16 @@ test("two independent browsers join, play privately, refresh and reconnect", asy
     await expect(page.locator(".hand button")).toHaveCount(4);
     await expect(friend.locator(".hand button")).toHaveCount(4);
     await expect(page.getByRole("checkbox")).toHaveCount(4);
-    await expect(friend.getByRole("checkbox")).toHaveCount(0);
+    await expect(friend.getByRole("checkbox")).toHaveCount(4);
+    await expect(page.locator(".deck-rail")).toHaveCount(0);
+    await friend.getByRole("checkbox").nth(0).check();
+    await friend.getByRole("checkbox").nth(1).check();
     await page.getByRole("checkbox").nth(0).check();
     await page.getByRole("checkbox").nth(1).check();
     await page.getByRole("button", { name: "保留所选任务" }).click();
     await expect(friend.getByRole("checkbox")).toHaveCount(4);
-    await friend.getByRole("checkbox").nth(0).check();
-    await friend.getByRole("checkbox").nth(1).check();
+    await expect(friend.getByRole("checkbox").nth(0)).toBeChecked();
+    await expect(friend.getByRole("checkbox").nth(1)).toBeChecked();
     await friend.getByRole("button", { name: "保留所选任务" }).click();
     await expect(
       page.getByRole("button", { name: /从牌堆抽牌/ }),
@@ -42,7 +45,30 @@ test("two independent browsers join, play privately, refresh and reconnect", asy
     await expect(
       friend.getByRole("button", { name: /从牌堆抽牌/ }),
     ).toBeDisabled();
+    await friend.getByRole("button", { name: "按颜色排序" }).click();
+    const sorted = await friend.locator(".hand button").allTextContents();
+    await friend.locator(".hand button").first().press("Alt+ArrowRight");
+    const reordered = await friend.locator(".hand button").allTextContents();
+    expect(reordered).toEqual([sorted[1], sorted[0], ...sorted.slice(2)]);
+    await friend
+      .getByRole("button", { name: "标记完成并收藏" })
+      .first()
+      .click();
+    await friend.locator(".travel-collection summary").click();
+    await expect(friend.locator(".travel-collection .ticket-card")).toHaveCount(
+      1,
+    );
+    await friend.getByRole("button", { name: "音效：关" }).click();
+    await expect(
+      friend.getByRole("button", { name: "音效：开" }),
+    ).toBeVisible();
     const hand = await friend.locator(".hand").textContent();
+    await friend.locator('[data-city="Paris"]').press("Enter");
+    await expect(friend.locator(".map-caption")).toContainText("Paris");
+    await expect(friend.getByRole("button", { name: "确认建站" })).toHaveCount(
+      0,
+    );
+    await expect(page.getByRole("alert")).toHaveCount(0);
     await page.getByRole("button", { name: /从牌堆抽牌/ }).click();
     await expect(page.locator(".hand button")).toHaveCount(5);
     await page.getByRole("button", { name: /从牌堆抽牌/ }).click();
@@ -50,6 +76,9 @@ test("two independent browsers join, play privately, refresh and reconnect", asy
       friend.getByRole("button", { name: /从牌堆抽牌/ }),
     ).toBeEnabled();
     await expect(friend.locator(".hand")).toHaveText(hand!);
+    await expect(friend.locator(".travel-collection summary")).toContainText(
+      "(1)",
+    );
     await friend.reload();
     await expect(
       friend.getByRole("button", { name: /从牌堆抽牌/ }),
@@ -81,6 +110,9 @@ test("two independent browsers join, play privately, refresh and reconnect", asy
     ).toBeEnabled();
     for (const raw of frames) {
       const message = JSON.parse(raw);
+      expect(
+        message.type === "error" && message.code === "INVALID_REQUEST",
+      ).toBe(false);
       const room = message.room;
       if (!room?.table) continue;
       expect(room.table).not.toHaveProperty("deck");

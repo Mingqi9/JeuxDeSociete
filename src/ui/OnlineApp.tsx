@@ -12,7 +12,7 @@ import { dictionaries, type Lang, type Words } from "./i18n";
 import { onlineWords } from "./onlineWords";
 import { Tabletop } from "./Tabletop";
 import { PlayerPieces } from "./PlayerPieces";
-import { TrainCard } from "./TrainCard";
+import { OrderedHand, usePreference, useGameSound } from "./personal";
 import { TicketCard } from "./TicketCard";
 import { GameActions } from "./GameActions";
 
@@ -50,6 +50,7 @@ function OnlineActions({
   } | null>(null);
   useEffect(() => {
     let active = true;
+    if (!selected && !city && table.pending?.kind !== "tunnel") return;
     const timer = setTimeout(
       () =>
         void preview(JSON.parse(key)).then((code) => {
@@ -107,15 +108,32 @@ export function OnlineApp({ onLocal }: { onLocal: () => void }) {
   const room = net.room,
     table = room?.table,
     self = room?.self;
+  const personalKey = `erc-personal:${room?.id ?? ""}:${room?.viewer ?? ""}`;
+  const [archived, setArchived] = usePreference<string[]>(
+    personalKey + ":tickets",
+    [],
+  );
+  const sound = useGameSound(
+    `${table?.phase}:${table?.turn}:${self?.hand.length}:${Object.keys(table?.claims ?? {}).length}`,
+  );
   const myTurn = !!table && table.players[table.active].id === room?.viewer;
-  const enabled = myTurn && net.status === "connected" && !net.busy;
+  const canChoose =
+    table?.phase === "setup" && table.pending?.kind === "tickets";
+  const enabled =
+    (myTurn || canChoose) && net.status === "connected" && !net.busy;
   useEffect(() => {
     setPayment([]);
-    setTickets([]);
-    setPreview(null);
+
     setSelected("");
     setCity("");
-  }, [room?.version]);
+  }, [self?.hand.join(","), table?.turn]);
+  const offerKey =
+    table?.pending?.kind === "tickets"
+      ? table.pending.tickets.map((t) => t.id).join(",")
+      : "";
+  useEffect(() => {
+    setTickets([]);
+  }, [offerKey]);
   useEffect(() => {
     try {
       localStorage.setItem("erc-language", lang);
@@ -148,6 +166,9 @@ export function OnlineApp({ onLocal }: { onLocal: () => void }) {
           {lang === "zh" ? "FR Français" : "中 中文"}
         </button>
       </header>
+      <button className="sound-toggle" onClick={sound.toggle}>
+        {sound.enabled ? n.soundOn : n.soundOff}
+      </button>
       <div className="mode-banner">
         {n.online} · {n[net.status]} {net.busy ? `· ${n.pending}` : ""}
       </div>
@@ -388,28 +409,25 @@ export function OnlineApp({ onLocal }: { onLocal: () => void }) {
                       {t.hand}{" "}
                       <span className="count-pill">{self?.hand.length}</span>
                     </h2>
-                    <div className="hand">
-                      {self?.hand.map((card, i) => (
-                        <TrainCard
-                          key={i}
-                          card={card}
-                          t={t}
-                          selected={payment.includes(i)}
-                          disabled={
-                            !enabled ||
-                            table.phase === "setup" ||
-                            table.pending?.kind === "tickets"
-                          }
-                          onClick={() =>
-                            setPayment((prev) =>
-                              prev.includes(i)
-                                ? prev.filter((n) => n !== i)
-                                : [...prev, i],
-                            )
-                          }
-                        />
-                      ))}
-                    </div>
+                    <OrderedHand
+                      hand={self?.hand ?? []}
+                      payment={payment}
+                      t={t}
+                      n={n}
+                      storageKey={personalKey + ":hand"}
+                      onSelect={(i) => {
+                        if (
+                          enabled &&
+                          table.phase === "playing" &&
+                          table.pending?.kind !== "tickets"
+                        )
+                          setPayment((prev) =>
+                            prev.includes(i)
+                              ? prev.filter((j) => j !== i)
+                              : [...prev, i],
+                          );
+                      }}
+                    />
                     <button onClick={() => setPayment([])}>{t.clear}</button>
                   </section>
                   {enabled && table.phase === "playing" && (
@@ -431,39 +449,51 @@ export function OnlineApp({ onLocal }: { onLocal: () => void }) {
                     <h2>
                       {table.pending?.kind === "tickets" ? t.choose : t.tickets}
                     </h2>
-                    {!myTurn && table.phase === "setup" && (
+                    {!canChoose && table.phase === "setup" && (
                       <p>{n.confirmSetup}</p>
                     )}
                     <div className="ticket-offer">
                       {(table.pending?.kind === "tickets"
                         ? table.pending.tickets
-                        : (self?.tickets ?? [])
+                        : (self?.tickets ?? []).filter(
+                            (ticket) => !archived.includes(ticket.id),
+                          )
                       ).map((ticket) => (
-                        <TicketCard
-                          key={ticket.id}
-                          ticket={ticket}
-                          cities={table.data.cities}
-                          t={t}
-                          previewing={preview?.id === ticket.id}
-                          checked={
-                            table.pending?.kind === "tickets"
-                              ? tickets.includes(ticket.id)
-                              : undefined
-                          }
-                          onChange={
-                            table.pending?.kind === "tickets"
-                              ? () => {
-                                  setTickets((prev) =>
-                                    prev.includes(ticket.id)
-                                      ? prev.filter((id) => id !== ticket.id)
-                                      : [...prev, ticket.id],
-                                  );
-                                  setPreview(ticket);
-                                }
-                              : undefined
-                          }
-                          onPreview={() => setPreview(ticket)}
-                        />
+                        <div key={ticket.id}>
+                          <TicketCard
+                            ticket={ticket}
+                            cities={table.data.cities}
+                            t={t}
+                            previewing={preview?.id === ticket.id}
+                            checked={
+                              table.pending?.kind === "tickets"
+                                ? tickets.includes(ticket.id)
+                                : undefined
+                            }
+                            onChange={
+                              table.pending?.kind === "tickets"
+                                ? () => {
+                                    setTickets((prev) =>
+                                      prev.includes(ticket.id)
+                                        ? prev.filter((id) => id !== ticket.id)
+                                        : [...prev, ticket.id],
+                                    );
+                                    setPreview(ticket);
+                                  }
+                                : undefined
+                            }
+                            onPreview={() => setPreview(ticket)}
+                          />
+                          {table.pending?.kind !== "tickets" && (
+                            <button
+                              onClick={() =>
+                                setArchived([...archived, ticket.id])
+                              }
+                            >
+                              {n.archive}
+                            </button>
+                          )}
+                        </div>
                       ))}
                     </div>
                     {table.pending?.kind === "tickets" && (
@@ -484,6 +514,38 @@ export function OnlineApp({ onLocal }: { onLocal: () => void }) {
                         </button>
                       </>
                     )}
+                    <details className="travel-collection">
+                      <summary>
+                        {n.collection} (
+                        {self?.tickets.filter((ticket) =>
+                          archived.includes(ticket.id),
+                        ).length ?? 0}
+                        )
+                      </summary>
+                      <p>{n.collectionHint}</p>
+                      {self?.tickets
+                        .filter((ticket) => archived.includes(ticket.id))
+                        .map((ticket) => (
+                          <div key={ticket.id}>
+                            <TicketCard
+                              ticket={ticket}
+                              cities={table.data.cities}
+                              t={t}
+                              previewing={preview?.id === ticket.id}
+                              onPreview={() => setPreview(ticket)}
+                            />
+                            <button
+                              onClick={() =>
+                                setArchived(
+                                  archived.filter((id) => id !== ticket.id),
+                                )
+                              }
+                            >
+                              {n.unarchive}
+                            </button>
+                          </div>
+                        ))}
+                    </details>
                   </section>
                 </div>
               </>
