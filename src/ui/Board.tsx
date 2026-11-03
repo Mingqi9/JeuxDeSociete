@@ -5,7 +5,8 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import type { Game, Ticket } from "../domain/model";
+import type { Ticket } from "../domain/model";
+import type { BoardState } from "../multiplayer/protocol";
 import type { Words } from "./i18n";
 import { BoardScenery } from "./BoardScenery";
 import { paints } from "./TrainCard";
@@ -21,7 +22,7 @@ export function Board({
   onSelectCity,
   enabled,
 }: {
-  game: Game;
+  game: BoardState;
   selected: string;
   onSelect: (id: string) => void;
   t: Words;

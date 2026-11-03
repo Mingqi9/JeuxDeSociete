@@ -2087,3 +2087,18 @@ h2,
   font-size: 11px;
   margin-left: auto;
 }
+.online-entry {
+  max-width: 360px;
+  margin: 0 auto 20px;
+}
+.setup-panel input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0 14px;
+}
+.lobby-seats {
+  text-align: left;
+  line-height: 2;
+  padding-left: 22px;
+}

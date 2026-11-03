@@ -2,6 +2,7 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
+  workers: 1,
   use: {
     baseURL: "http://127.0.0.1:4173",
     headless: true,
@@ -21,9 +22,23 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
-    command: "npm run dev -- --port 4173 --strictPort",
-    url: "http://127.0.0.1:4173",
-    reuseExistingServer: false,
-  },
+  webServer: [
+    {
+      command: "npm run dev -- --port 4173 --strictPort",
+      env: { GAME_SERVER_TARGET: "http://127.0.0.1:3002" },
+      url: "http://127.0.0.1:4173",
+      reuseExistingServer: false,
+    },
+    {
+      command: "npm run server",
+      env: {
+        PORT: "3002",
+        LOCAL_DATABASE_DIR: ".local-data/e2e",
+        ALLOWED_ORIGINS: "http://127.0.0.1:4173",
+      },
+      url: "http://127.0.0.1:3002/health",
+      reuseExistingServer: false,
+      timeout: 30000,
+    },
+  ],
 });

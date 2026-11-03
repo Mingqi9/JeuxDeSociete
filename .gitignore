@@ -13,3 +13,8 @@ playwright-report/
 *.key
 .npmrc
 *.local
+
+# Server development database (contains private games and seat hashes)
+.local-data/
+
+.server-build/

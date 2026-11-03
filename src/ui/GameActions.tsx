@@ -1,4 +1,3 @@
-import { actionError } from "../domain/engine";
 import {
   routePoints,
   type Game,
@@ -9,6 +8,7 @@ import type { Words } from "./i18n";
 import { TrainArt } from "./TrainCard";
 export function GameActions({
   game,
+  validate,
   selected,
   city,
   onCancel,
@@ -16,7 +16,10 @@ export function GameActions({
   t,
   dispatch,
 }: {
-  game: Game;
+  game: Pick<Game, "data" | "active" | "pending" | "claims"> & {
+    players: Pick<Game["players"][number], "id" | "name" | "stations">[];
+  };
+  validate: (action: Action) => string | null;
   selected: string;
   city: string;
   onCancel: () => void;
@@ -32,7 +35,7 @@ export function GameActions({
     code ? (t.errors[code as keyof typeof t.errors] ?? code) : "";
   if (pending?.kind === "tickets") return null;
   if (pending?.kind === "tunnel") {
-    const error = actionError(game, p.id, { type: "resolveTunnel", payment });
+    const error = validate({ type: "resolveTunnel", payment });
     return (
       <section className="surface tunnel-panel">
         <h2>{t.tunnel}</h2>
@@ -68,9 +71,9 @@ export function GameActions({
     );
   }
   const claimError = r
-    ? actionError(game, p.id, { type: "claim", route: r.id, payment })
+    ? validate({ type: "claim", route: r.id, payment })
     : "UNKNOWN_ROUTE";
-  const stationError = actionError(game, p.id, {
+  const stationError = validate({
     type: "station",
     city,
     payment,

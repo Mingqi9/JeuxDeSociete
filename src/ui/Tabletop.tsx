@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import type { Action, Game, Ticket } from "../domain/model";
+import type { Action, Ticket } from "../domain/model";
+import type { TableState } from "../multiplayer/protocol";
 import { routePoints } from "../domain/model";
 import type { Words } from "./i18n";
 import { Board } from "./Board";
@@ -16,7 +17,7 @@ export function Tabletop({
   enabled,
   sidebar,
 }: {
-  game: Game;
+  game: TableState;
   selected: string;
   onSelect: (id: string) => void;
   selectedCity: string;
@@ -70,20 +71,20 @@ export function Tabletop({
       <aside className="deck-rail" aria-label={t.market}>
         <button
           className="card-back ticket-deck"
-          aria-label={`${t.drawTickets} (${game.ticketDeck.length})`}
-          disabled={!enabled || !!pending || !game.ticketDeck.length}
+          aria-label={`${t.drawTickets} (${game.ticketCount})`}
+          disabled={!enabled || !!pending || !game.ticketCount}
           onClick={() => dispatch({ type: "drawTickets" })}
         >
           <span className="deck-emblem" aria-hidden="true">
             ◇
           </span>
           <strong>{t.destinationDeck}</strong>
-          <span>{game.ticketDeck.length}</span>
+          <span>{game.ticketCount}</span>
         </button>
         <button
           className="card-back train-deck"
           aria-label={t.blind}
-          disabled={locked || game.deck.length + game.discard.length === 0}
+          disabled={locked || game.deckCount + game.discardCount === 0}
           onClick={() => dispatch({ type: "drawCard", source: "blind" })}
         >
           <span className="deck-emblem" aria-hidden="true">
@@ -91,7 +92,7 @@ export function Tabletop({
           </span>
           <strong>{t.trainDeck}</strong>
           <span>
-            {game.deck.length} {t.remaining}
+            {game.deckCount} {t.remaining}
           </span>
         </button>
         <div className="market">
@@ -108,17 +109,17 @@ export function Tabletop({
         </div>
         <div
           className="discard-stack"
-          aria-label={`${t.discardPile} (${game.discard.length})`}
+          aria-label={`${t.discardPile} (${game.discardCount})`}
         >
-          {game.discard.length > 0 ? (
-            <TrainArt card={game.discard[game.discard.length - 1]} />
+          {game.discardCount > 0 ? (
+            <TrainArt card={game.discardTop!} />
           ) : (
             <span className="empty-discard" aria-hidden="true">
               ↻
             </span>
           )}
           <small>
-            {t.discardPile} · {game.discard.length}
+            {t.discardPile} · {game.discardCount}
           </small>
         </div>
         <p className="market-hint">{t.marketRule}</p>

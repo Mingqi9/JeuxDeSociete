@@ -42,7 +42,7 @@ export function PlayerPieces({
   active,
   t,
 }: {
-  player: Player;
+  player: Omit<Player, "hand" | "tickets">;
   index: number;
   active: boolean;
   t: Words;

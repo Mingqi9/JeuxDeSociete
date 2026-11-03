@@ -13,7 +13,11 @@ import {
 } from "./model";
 import { validateDataset } from "./dataValidation";
 // PRNG state is part of the authoritative state: replay never depends on ambient Math.random.
+// Online callers inject cryptographic randomness; the source is never serialized.
+const randomSources = new WeakMap<object, () => number>();
 function random(g: Pick<Game, "rng">) {
+  const source = randomSources.get(g);
+  if (source) return source();
   g.rng = (Math.imul(1664525, g.rng) + 1013904223) >>> 0;
   return g.rng / 4294967296;
 }
@@ -60,6 +64,7 @@ export function createGame(
   data: Dataset,
   seed = 1,
   chosenColors: PlayerColor[] = playerColors.slice(0, names.length),
+  randomSource?: () => number,
 ): Game {
   validateDataset(data);
   requireRule(
@@ -99,6 +104,7 @@ export function createGame(
     rng: seed >>> 0,
     turn: 1,
   };
+  if (randomSource) randomSources.set(g, randomSource);
   g.deck = shuffle(g, [
     ...colors.flatMap((c) => Array<Card>(12).fill(c)),
     ...Array<Card>(14).fill("wild"),
@@ -197,13 +203,19 @@ function claim(g: Game, r: Route, cards: Card[]) {
   refill(g);
   endTurn(g);
 }
-export function transition(state: Game, actor: string, input: unknown): Game {
+export function transition(
+  state: Game,
+  actor: string,
+  input: unknown,
+  randomSource?: () => number,
+): Game {
   const parsed = actionSchema.safeParse(input);
   requireRule(parsed.success, "INVALID_ACTION");
   const a = parsed.data;
   requireRule(state.phase !== "finished", "GAME_OVER");
   requireRule(state.players[state.active].id === actor, "NOT_YOUR_TURN");
   const g = structuredClone(state);
+  if (randomSource) randomSources.set(g, randomSource);
   const p = player(g);
   if (a.type === "keepTickets") {
     requireRule(g.pending?.kind === "tickets", "WRONG_PHASE");

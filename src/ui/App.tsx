@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { createGame, transition } from "../domain/engine";
+import { createGame, transition, actionError } from "../domain/engine";
 import { scoreGame } from "../domain/scoring";
 import {
   RuleError,
@@ -12,11 +12,14 @@ import {
 import { demo } from "../data/demo";
 import { europe } from "../data/europe";
 import { dictionaries, type Lang } from "./i18n";
+import { localTable } from "../multiplayer/protocol";
 import { Tabletop } from "./Tabletop";
 import { PlayerPieces, PieceReserve, playerPaints } from "./PlayerPieces";
 import { TrainCard } from "./TrainCard";
 import { TicketCard } from "./TicketCard";
 import { GameActions } from "./GameActions";
+import { OnlineApp } from "./OnlineApp";
+import { onlineWords } from "./onlineWords";
 function initialLanguage(): Lang {
   try {
     return localStorage.getItem("erc-language") === "fr" ? "fr" : "zh";
@@ -25,6 +28,12 @@ function initialLanguage(): Lang {
   }
 }
 export function App({ initialGame }: { initialGame?: Game } = {}) {
+  const [online, setOnline] = useState(
+    () =>
+      !initialGame &&
+      (new URL(location.href).searchParams.has("room") ||
+        new URL(location.href).searchParams.has("online")),
+  );
   const [lang, setLang] = useState<Lang>(initialLanguage),
     [names, setNames] = useState("Alice\nCamille"),
     [chosenColors, setChosenColors] = useState<PlayerColor[]>([
@@ -138,6 +147,15 @@ export function App({ initialGame }: { initialGame?: Game } = {}) {
     pending = game?.pending,
     setup = game?.phase === "setup";
   const paid = p ? payment.map((i) => p.hand[i]) : [];
+  if (online)
+    return (
+      <OnlineApp
+        onLocal={() => {
+          history.replaceState(null, "", location.pathname);
+          setOnline(false);
+        }}
+      />
+    );
   return (
     <div
       className={`app ${game ? "at-table" : ""} ${game && game.phase !== "finished" ? "live-table" : ""}`}
@@ -164,6 +182,12 @@ export function App({ initialGame }: { initialGame?: Game } = {}) {
       )}
       {!game ? (
         <main className="hero">
+          <button
+            className="primary online-entry"
+            onClick={() => setOnline(true)}
+          >
+            {onlineWords[lang].online}
+          </button>
           <div className="badge">2–5 · EUROPA RAIL CLUB</div>
           <h1>{t.title}</h1>
           <p>{t.subtitle}</p>
@@ -314,7 +338,7 @@ export function App({ initialGame }: { initialGame?: Game } = {}) {
             ))}
           </div>
           <Tabletop
-            game={game}
+            game={localTable(game)}
             selected={selected}
             onSelect={(id) => {
               setSelected(id);
@@ -387,6 +411,13 @@ export function App({ initialGame }: { initialGame?: Game } = {}) {
                     {!setup && (
                       <GameActions
                         game={game}
+                        validate={(action) =>
+                          actionError(
+                            game,
+                            game.players[game.active].id,
+                            action,
+                          )
+                        }
                         selected={selected}
                         city={selectedCity}
                         onCancel={() => {

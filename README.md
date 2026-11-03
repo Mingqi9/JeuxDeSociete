@@ -1,12 +1,14 @@
 # Europa Rail Club
 
-Vercel 部署步骤见 [DEPLOYMENT.md](DEPLOYMENT.md)。线上链接目前提供本地轮流游戏；远程同步房间尚未实现。
+本地联机及 Vercel + Node.js + PostgreSQL 部署步骤见 [DEPLOYMENT.md](DEPLOYMENT.md)。M2 已加入真实服务器联机；尚未部署云端后端，现有线上链接不会自动获得这些能力。
 
-**M0 complete; M1 in progress.** A React + TypeScript railway game for 2–5 people taking turns on one device. The Europe full-map candidate now supports complete local games and automatic final scoring. There are no shared rooms, remote players, backend or reconnect yet.
+**M2 implemented locally; cloud acceptance pending.** React + TypeScript railway game for 2–5 people, with local pass-and-play and authoritative Node/WebSocket rooms. Private hands, invitation links, transactional saves and reconnect are implemented. The Europe full-map candidate supports complete games and automatic final scoring; final dataset audit remains pending.
 
 换电脑继续开发请先阅读 [HANDOFF.md](HANDOFF.md)，其中包含克隆、启动命令、当前进度和给新 Codex 会话的交接提示。
 
 ## Run locally
+
+For multiplayer, run `npm run server` in a second terminal, then open `http://127.0.0.1:5173/?online=1`. Create a room and join its invite link in another browser or private window. Development uses embedded PostgreSQL on disk; no cloud account is required. Production requires hosted PostgreSQL and a separate Node server. See the deployment guide for configuration and limitations.
 
 With Node.js 22 or newer installed, open a terminal **in the project directory**:
 
