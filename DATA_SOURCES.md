@@ -1,0 +1,26 @@
+# Europe base dataset provenance and audit
+
+This project distributes an original schematic and numerical game facts, not publisher artwork, card images, logos or rulebook text. The full-coverage Europe dataset remains **candidate / `complete: false`** until its ticket values are independently checked against authoritative cards or a publisher list. Coverage is not a claim of publisher approval.
+
+## Sources and permissions
+
+1. **Routes:** Richard Darst, [board-game-networks Europe YAML](https://github.com/rkdarst/board-game-networks/blob/master/data/ticket-to-ride/europe.yaml). The [source README](https://github.com/rkdarst/board-game-networks/blob/master/README.rst) licenses original data under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Our unmodified source snapshot is `references/europe-network.yaml`; original SHA-256 `71287d7553549f9e3636283bcca164864f55aa4035608696d0372a822454c20f`. Attribution is retained here and in the app's data notes. Derived route facts retain CC BY 4.0 attribution; no endorsement is implied. Node spelling corrections and all schematic coordinates are our changes.
+2. **Tickets and independent route distances:** Konstantinos Tsiligkiris, [ticket2ride 0.3.1 source](https://docs.rs/ticket2ride/0.3.1/src/ticket2ride/lib.rs.html), [author repository](https://github.com/ktsiligkiris/ticket2ride). Crate metadata declares **Apache-2.0**; a copy of the license is in `licenses/Apache-2.0.txt`. Only the 46 factual endpoint/point/long-flag triples were extracted into `references/europe-ticket-triples.csv`; no Rust algorithm is copied. Retrieved HTML SHA-256 `6707ff5d398268922385fabac3568afa74cd5aeacca891fb785fc470ff9a0e58` (HTML is not bundled). Derived JSON changes spellings, IDs and format. No NOTICE file is present in the repository listing.
+3. **Authoritative rules and visual route check:** [Publisher rulebook](https://cdn.svc.asmodee.net/production-daysofwonder/uploads/2024/07/7202-T2RE-Rules-EN.pdf), printed pp. 2–3, setup map; pp. 4–5, route/tunnel/ferry conventions. Downloaded only to `/tmp` for inspection. Publisher artwork is not copied into the application or reference directory.
+
+4. **Independent ticket cross-check:** Rakesh Chintha, [Genie Lab analysis, 2019-02-07](https://genielab.github.io/data-stories/ttr_analysis/), destination-card table. All 46 endpoint/point triples match after accent normalization and direction-insensitive comparison. The article itself is not redistributed. `references/europe-audit.json` records the retrieved HTML hash and the canonical factual-triple fingerprint; long flags in that table were inferred from its 20/21-point bands, not independently verified from card backgrounds.
+
+## Audit performed
+
+- **Coverage:** 47 cities, 101 individual tracks over 90 city pairs, 11 double-track pairs, 300 train spaces, 18 tunnel tracks and 13 ferry tracks. 40 regular tickets and 6 long tickets. These are checked against the snapshots and publisher component counts; matching counts alone do not prove correctness.
+- **Topology and lengths:** the separate ticket2ride adjacency transcription contains 180 directed entries (90 undirected pairs). All agree with the network dataset after city-name normalization. This secondary implementation does not encode track colors, ferries, tunnels or duplicate tracks.
+- **Route attributes:** visually reviewed all network tracks by west/central/Scandinavian/Balkan/eastern groups against the publisher setup map. Double tracks, ferry locomotives and tunnel borders match. The publisher map illustrates the full board but setup markers obscure parts of the southwest labels; city spellings were normalized consistently rather than copying source typos.
+- **Corrections from network YAML:** `Muchen` → `München`, `Palmero` → `Palermo`, `Zurich` → `Zürich`, `Athína` → `Athina`; `København`, `Cádiz`, `Zagrab`, `Kyiv` and `Bucuresti` are used consistently throughout tickets and routes. These are canonical app identifiers; publisher editions may typeset accents differently.
+- **Schematic:** all 47 coordinates were designed for this app. Parallel tracks receive generic perpendicular offsets, unrelated to official board artwork.
+- **Tickets:** 46 triples transcribed from the named source, without generated filler. All endpoints/values also agree with the independent Genie Lab table. Individual authoritative card verification remains pending; candidate status is explicit in data and UI. The publisher's example Venezia–Constantinople 10 and København–Erzurum 21 agree.
+
+## Reproducible checks and remaining gate
+
+`npm run test:data` validates structural integrity, all source route attributes, all source ticket triples, graph connectedness, parallel-route consistency and known high-risk routes. These are provenance/regression checks, not independent proof that a source transcription is correct. Tests run offline and never download data at build/runtime.
+
+Before changing `complete` to true: independently compare all ticket endpoints/values/long flags with authorized publisher/card references, record every discrepancy and resolution here, and close the provisional market exhaustion rule in RULES_VERIFICATION.md. Do not silently substitute 1912 expansion tickets or use test fixtures as real cards.

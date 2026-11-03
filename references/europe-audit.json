@@ -1,0 +1,20 @@
+{
+  "reviewedOn": "2026-11-03",
+  "independentTickets": {
+    "author": "Rakesh Chintha (Genie Lab)",
+    "url": "https://genielab.github.io/data-stories/ttr_analysis/",
+    "originalHtmlSha256": "7f6413c871288d67a242b1e1a77c011f54428c5324c3040bf2af1b966e8d505c",
+    "canonicalTriplesSha256": "c23ca88c65e394de523e8471157570f46e8f33f92c52850f22c6ad2dec7a8025",
+    "matched": 46,
+    "differences": 0,
+    "longFlags": "inferred from point bands in this table, not independently confirmed from card backgrounds"
+  },
+  "independentRoutes": {
+    "author": "Konstantinos Tsiligkiris",
+    "source": "ticket2ride 0.3.1 adjacency data",
+    "directedCompared": 180,
+    "matchedPairs": 90,
+    "differences": 0
+  },
+  "publisherCardAuditComplete": false
+}

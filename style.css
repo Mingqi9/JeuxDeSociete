@@ -1,0 +1,2 @@
+/* Compatibility stylesheet; maintained styles live in src/styles.css. */
+@import './src/styles.css';
