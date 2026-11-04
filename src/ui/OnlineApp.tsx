@@ -1,3 +1,5 @@
+import { Landing } from "./Landing";
+import { landingWords } from "./landingWords";
 import { cityName } from "./cityNames";
 import { LanguageSelect } from "./LanguageSelect";
 import { readLanguage } from "./i18n";
@@ -99,6 +101,9 @@ export function OnlineApp({ onLocal }: { onLocal: () => void }) {
     fixture: base.europeCandidate,
     errors: { ...base.errors, ...n.errors },
   } as Words;
+  const [admission, setAdmission] = useState<"create" | "join">(() =>
+    invitationRoom() ? "join" : "create",
+  );
   const [name, setName] = useState(""),
     [roomId, setRoomId] = useState(invitationRoom),
     [color, setColor] = useState<PlayerColor>("red"),
@@ -157,13 +162,17 @@ export function OnlineApp({ onLocal }: { onLocal: () => void }) {
     ? `${location.origin}${location.pathname}?room=${room.id}`
     : "";
   return (
-    <div className={`app ${active ? "at-table live-table" : ""}`}>
-      <header>
-        <div className="brand">
-          ✦ EUROPA <span>RAIL CLUB</span>
-        </div>
-        <LanguageSelect lang={lang} onChange={setLang} />
-      </header>
+    <div
+      className={`app ${!room ? "landing-app" : ""} ${active ? "at-table live-table" : ""}`}
+    >
+      {room && (
+        <header>
+          <div className="brand">
+            ✦ EUROPA <span>RAIL CLUB</span>
+          </div>
+          <LanguageSelect lang={lang} onChange={setLang} />
+        </header>
+      )}
       <button className="sound-toggle" onClick={sound.toggle}>
         {sound.enabled ? n.soundOn : n.soundOff}
       </button>
@@ -179,58 +188,115 @@ export function OnlineApp({ onLocal }: { onLocal: () => void }) {
         </div>
       )}
       {!room ? (
-        <main className="hero">
-          <h1>{n.online}</h1>
-          <section className="panel setup-panel">
-            <p>{n.noRoom}</p>
-            <label>
-              {n.nickname}
-              <input
-                value={name}
-                maxLength={30}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </label>
-            <label>
-              {t.playerColor}
-              <select
-                value={color}
-                onChange={(e) => setColor(e.target.value as PlayerColor)}
+        <Landing lang={lang} setLang={setLang} mode="online" onMode={onLocal}>
+          <div className="landing-section-heading">
+            <span className="landing-eyebrow">ONLINE / EUROPA RAIL CLUB</span>
+            <h2>{landingWords[lang].welcome}</h2>
+            <p>{landingWords[lang].onlineIntro}</p>
+          </div>
+          <div className="admission-tabs" role="tablist" aria-label={n.online}>
+            {(["create", "join"] as const).map((id) => (
+              <button
+                key={id}
+                id={`admission-${id}`}
+                role="tab"
+                aria-selected={admission === id}
+                aria-controls="admission-panel"
+                tabIndex={admission === id ? 0 : -1}
+                onClick={() => setAdmission(id)}
+                onKeyDown={(e) => {
+                  if (
+                    ["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)
+                  ) {
+                    e.preventDefault();
+                    const next =
+                      e.key === "Home"
+                        ? "create"
+                        : e.key === "End"
+                          ? "join"
+                          : admission === "create"
+                            ? "join"
+                            : "create";
+                    setAdmission(next);
+                    document.getElementById(`admission-${next}`)?.focus();
+                  }
+                }}
               >
-                {playerColors.map((c) => (
-                  <option key={c} value={c}>
-                    {t[c]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              className="primary"
-              disabled={net.busy || !name.trim()}
-              onClick={() =>
-                void net.admit(true, name, color, crypto.randomUUID())
-              }
+                {landingWords[lang][id]}
+              </button>
+            ))}
+          </div>
+          <section
+            id="admission-panel"
+            role="tabpanel"
+            aria-labelledby={`admission-${admission}`}
+            className="admission-panel"
+          >
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (
+                  !net.busy &&
+                  name.trim() &&
+                  (admission === "create" || roomId)
+                )
+                  void net.admit(
+                    admission === "create",
+                    name,
+                    color,
+                    admission === "create" ? crypto.randomUUID() : roomId,
+                  );
+              }}
             >
-              {n.create}
-            </button>
-            <small>{n.automaticColor}</small>
-            <label>
-              {n.roomId}
-              <input
-                value={roomId}
-                onChange={(e) => setRoomId(e.target.value.trim())}
-              />
-            </label>
-            <button
-              disabled={net.busy || !name.trim() || !roomId}
-              onClick={() => void net.admit(false, name, color, roomId)}
-            >
-              {n.join}
-            </button>
-            <p>{n.saved}</p>
-            <button onClick={onLocal}>{n.local}</button>
+              <label>
+                {n.nickname}
+                <input
+                  autoComplete="nickname"
+                  value={name}
+                  maxLength={30}
+                  required
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </label>
+              <label>
+                {t.playerColor}
+                <select
+                  value={color}
+                  onChange={(e) => setColor(e.target.value as PlayerColor)}
+                >
+                  {playerColors.map((c) => (
+                    <option key={c} value={c}>
+                      {t[c]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {admission === "join" && (
+                <label>
+                  {n.roomId}
+                  <input
+                    value={roomId}
+                    required
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    onChange={(e) => setRoomId(e.target.value.trim())}
+                  />
+                </label>
+              )}
+              <small>{n.automaticColor}</small>
+              <button
+                className="primary"
+                type="submit"
+                disabled={
+                  net.busy || !name.trim() || (admission === "join" && !roomId)
+                }
+              >
+                {n[admission]} <span aria-hidden="true">↗</span>
+              </button>
+            </form>
+            <p className="admission-note">{n.saved}</p>
           </section>
-        </main>
+        </Landing>
       ) : !table ? (
         <main className="hero">
           <h1>{n.lobby}</h1>

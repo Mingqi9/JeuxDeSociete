@@ -129,7 +129,7 @@ test("Europe candidate map plays a complete game in browser to automatic final s
 test("Europe selection, distinct parallel tracks, ferry error, station occupancy and later tickets", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/?local=1");
   await expect(page.locator("#map-mode")).toHaveValue("europe");
   await expect(page.locator("#map-mode option:checked")).toHaveText(
     "欧洲全图预览 · 数据待最终核验",

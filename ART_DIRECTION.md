@@ -24,3 +24,11 @@ The three supplied publisher PDFs were downloaded to temporary storage and inspe
 Use `npm test`, `npm run build`, `npm run format:check` and `npm run test:e2e`. The existing browser flows capture desktop/mobile tabletop setup and play screens under `test-results/`. This visual increment introduces no new dependencies or runtime image downloads. No visual-only mirror tests were added.
 
 The full-map candidate verification gates, local-only state, lack of save/reconnect and lack of remote multiplayer remain unchanged.
+
+## Homepage reference revision — 2026-11-04
+
+The product owner supplied a homepage mockup and three matching images in Downloads, and requested their use. The new homepage follows that mockup: wide illustrated hero, dark plum overlay, translucent language selector, box image, title image and three compact facts. The lower section uses pale neutral paper, a stationary vertical directory and a separately scrolling right content pane. Mobile preserves a compact left directory with a larger usable right pane.
+
+Supplied assets copied unchanged into `public/images/`: `railway-hero.webp` (T2Reurope-REFRESH-1920x1239-1.webp), `railway-title-fr.webp` (T2R_EUROPE_REFRESH_FR.webp), and `railway-box-fr.webp` (T2REUROPE-V2-3Dbox-left-FR.webp). These are publisher visuals supplied by the product owner, not newly created original assets. The French wordmark is retained as supplied in all language modes; the surrounding interface is translated. The game board and game cards retain their original artwork.
+
+Remote play is now the default entry. The directory offers remote play, rules, introduction and local play. Create/join tabs call the existing room admission service. Invite links open the join tab with the room code. Rulebooks use the three previously supplied publisher URLs with a language selector, PDF frame and always-available external link; PDF service availability and browser embedding are external dependencies. Browser tests intercept the PDF network request to verify UI behavior without claiming to validate external PDF rendering.

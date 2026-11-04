@@ -81,7 +81,7 @@ test("place a station on the map, cancel the preview, then pay and build", async
 test("choose unique colors, then privately inspect simultaneous cards/tickets against the central board", async ({
   page,
 }, info) => {
-  await page.goto("/");
+  await page.goto("/?local=1");
   await page
     .getByRole("combobox", { name: "玩家颜色 Alice" })
     .selectOption("blue");
@@ -109,7 +109,7 @@ test("choose unique colors, then privately inspect simultaneous cards/tickets ag
   await expect(page.locator(".long-ticket")).toHaveCount(1);
   await expect(page.locator(".short-ticket")).toHaveCount(3);
   await expect(page.getByRole("button", { name: "确认铺设" })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: /从牌堆抽牌/ })).toBeDisabled();
+  await expect(page.locator(".deck-rail")).toHaveCount(0);
   await expect(page.locator(".express-card")).not.toBeVisible();
   await page.getByText("计分说明", { exact: true }).click();
   await expect(page.locator(".express-card")).toBeVisible();
@@ -126,23 +126,7 @@ test("choose unique colors, then privately inspect simultaneous cards/tickets ag
   await expect(page.getByRole("checkbox").first()).not.toBeChecked();
   await page.getByRole("checkbox").nth(0).check();
   await page.getByRole("checkbox").nth(1).check();
-  if (info.project.name === "desktop") {
-    const board = (await page.locator(".map-panel").boundingBox())!,
-      left = (await page.locator(".table-left").boundingBox())!,
-      rail = (await page.locator(".deck-rail").boundingBox())!;
-    expect(left.x + left.width).toBeLessThan(board.x);
-    expect(rail.x).toBeGreaterThan(board.x + board.width);
-    const taskDeck = (await page.locator(".ticket-deck").boundingBox())!,
-      trainDeck = (await page.locator(".train-deck").boundingBox())!;
-    expect(taskDeck.y + taskDeck.height).toBeLessThan(trainDeck.y);
-    const faceups = await page.locator(".market .train-card").all();
-    let previous = trainDeck.y + trainDeck.height;
-    for (const card of faceups) {
-      const box = (await card.boundingBox())!;
-      expect(box.y).toBeGreaterThan(previous);
-      previous = box.y + box.height;
-    }
-  }
+
   expect(
     await page.evaluate(
       () =>
@@ -168,6 +152,23 @@ test("choose unique colors, then privately inspect simultaneous cards/tickets ag
   ).toBeVisible();
   await page.getByRole("button", { name: "查看我的回合 →" }).click();
   await expect(page.getByRole("button", { name: /从牌堆抽牌/ })).toBeEnabled();
+  if (info.project.name === "desktop") {
+    const board = (await page.locator(".map-panel").boundingBox())!,
+      left = (await page.locator(".table-left").boundingBox())!,
+      rail = (await page.locator(".deck-rail").boundingBox())!;
+    expect(left.x + left.width).toBeLessThan(board.x);
+    expect(rail.x).toBeGreaterThan(board.x + board.width);
+    const taskDeck = (await page.locator(".ticket-deck").boundingBox())!,
+      trainDeck = (await page.locator(".train-deck").boundingBox())!;
+    expect(taskDeck.y + taskDeck.height).toBeLessThan(trainDeck.y);
+    const faceups = await page.locator(".market .train-card").all();
+    let previous = trainDeck.y + trainDeck.height;
+    for (const card of faceups) {
+      const box = (await card.boundingBox())!;
+      expect(box.y).toBeGreaterThan(previous);
+      previous = box.y + box.height;
+    }
+  }
 });
 test("claim immediately moves the colored marker and spends the matching plastic pieces", async ({
   page,

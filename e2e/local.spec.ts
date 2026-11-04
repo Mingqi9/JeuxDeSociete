@@ -4,7 +4,7 @@ test("local ticket setup, privacy handoff, card turn and early training score", 
 }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("/");
+  await page.goto("/?local=1");
   await page.locator("#map-mode").selectOption("demo");
   await expect(
     page.getByText("本地轮流操作 · 无联网房间", { exact: true }).first(),
@@ -44,7 +44,7 @@ test("local ticket setup, privacy handoff, card turn and early training score", 
 test("French preference persists and mobile layout stays within viewport", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/?local=1");
   await page.locator("#map-mode").selectOption("demo");
   await page.locator("select.language").selectOption("fr");
   await expect(page.getByLabel("Pseudos (un par ligne)")).toBeVisible();
@@ -70,14 +70,16 @@ test("French preference persists and mobile layout stays within viewport", async
 test("English persists across local and online screens; Chinese cities match tickets", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/?local=1");
   await page.locator("select.language").selectOption("en");
   await expect(
     page.getByLabel("Player names (one per line)", { exact: true }),
   ).toBeVisible();
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  await page.getByRole("button", { name: "Play online", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Play with friends", exact: true })
+    .click();
   await expect(
     page.getByRole("button", { name: "Create private room" }),
   ).toBeVisible();

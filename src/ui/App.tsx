@@ -1,3 +1,4 @@
+import { Landing } from "./Landing";
 import { cityName } from "./cityNames";
 import { LanguageSelect } from "./LanguageSelect";
 import { readLanguage } from "./i18n";
@@ -32,10 +33,7 @@ function initialLanguage(): Lang {
 }
 export function App({ initialGame }: { initialGame?: Game } = {}) {
   const [online, setOnline] = useState(
-    () =>
-      !initialGame &&
-      (new URL(location.href).searchParams.has("room") ||
-        new URL(location.href).searchParams.has("online")),
+    () => !initialGame && !new URL(location.href).searchParams.has("local"),
   );
   const [lang, setLang] = useState<Lang>(initialLanguage),
     [names, setNames] = useState("Alice\nCamille"),
@@ -154,22 +152,25 @@ export function App({ initialGame }: { initialGame?: Game } = {}) {
     return (
       <OnlineApp
         onLocal={() => {
-          history.replaceState(null, "", location.pathname);
+          history.replaceState(null, "", location.pathname + "?local=1");
+          setLang(readLanguage());
           setOnline(false);
         }}
       />
     );
   return (
     <div
-      className={`app ${game ? "at-table" : ""} ${game && game.phase !== "finished" ? "live-table" : ""}`}
+      className={`app ${!game ? "landing-app" : ""} ${game ? "at-table" : ""} ${game && game.phase !== "finished" ? "live-table" : ""}`}
     >
-      <header>
-        <div className="brand">
-          ✦ EUROPA <span>RAIL CLUB</span>
-        </div>
-        <LanguageSelect lang={lang} onChange={setLang} />
-      </header>
-      <div className="mode-banner">{t.local}</div>
+      {game && (
+        <header>
+          <div className="brand">
+            ✦ EUROPA <span>RAIL CLUB</span>
+          </div>
+          <LanguageSelect lang={lang} onChange={setLang} />
+        </header>
+      )}
+      {game && <div className="mode-banner">{t.local}</div>}
       {error && (
         <div role="alert" className="error">
           {t.error}：{t.errors[error as keyof typeof t.errors] ?? error}
@@ -179,18 +180,16 @@ export function App({ initialGame }: { initialGame?: Game } = {}) {
         </div>
       )}
       {!game ? (
-        <main className="hero">
-          <button
-            className="primary online-entry"
-            onClick={() => setOnline(true)}
-          >
-            {onlineWords[lang].online}
-          </button>
-          <div className="badge">2–5 · EUROPA RAIL CLUB</div>
-          <h1>{t.title}</h1>
-          <p>{t.subtitle}</p>
-          <div className="illustration" aria-hidden="true">
-            ✦ ━ 🚂 ━ ✦
+        <Landing
+          lang={lang}
+          setLang={setLang}
+          mode="local"
+          onMode={() => setOnline(true)}
+        >
+          <div className="landing-section-heading">
+            <span className="landing-eyebrow">LOCAL / EUROPA RAIL CLUB</span>
+            <h2>{onlineWords[lang].local}</h2>
+            <p>{t.local}</p>
           </div>
           <section className="panel setup-panel">
             <p>{t.intro}</p>
@@ -257,7 +256,7 @@ export function App({ initialGame }: { initialGame?: Game } = {}) {
             </button>
             <small>{t.setupWaiting}</small>
           </section>
-        </main>
+        </Landing>
       ) : game.phase === "finished" ? (
         <main className="results">
           <h1>{t.results}</h1>

@@ -80,3 +80,7 @@ Default map scale fills the available width, allowing vertical pan where needed.
 ## Language expansion — 2026-11-04
 
 Support Chinese, French and English in both local and online screens, with a persisted language selector. Chinese mode displays Chinese city names on the map, ticket cards, endpoint previews and route/station details. Canonical city identifiers and game data remain unchanged.
+
+## Homepage revision — 2026-11-04
+
+Follow the product owner's supplied mockup and three supplied images: purple illustrated hero with box, wordmark, language selector and game facts. The lower desktop/mobile layout has a fixed left vertical directory and an independently scrolling right panel. Sections: remote play (separate create/join tabs), trilingual publisher rulebooks, introduction, and retained local mode. Private invite links open the join form. Keep real admission, errors, keyboard access and independent language preferences. Supplied publisher homepage assets are an explicit exception to the original-art policy for this requested homepage; game board and card art remain original.
