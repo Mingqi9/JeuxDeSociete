@@ -46,7 +46,7 @@ test("French preference persists and mobile layout stays within viewport", async
 }) => {
   await page.goto("/");
   await page.locator("#map-mode").selectOption("demo");
-  await page.getByRole("button", { name: "FR Français" }).click();
+  await page.locator("select.language").selectOption("fr");
   await expect(page.getByLabel("Pseudos (un par ligne)")).toBeVisible();
   await page.reload();
   await page.locator("#map-mode").selectOption("demo");
@@ -65,4 +65,34 @@ test("French preference persists and mobile layout stays within viewport", async
     path: `test-results/local-${test.info().project.name}.png`,
     fullPage: true,
   });
+});
+
+test("English persists across local and online screens; Chinese cities match tickets", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.locator("select.language").selectOption("en");
+  await expect(
+    page.getByLabel("Player names (one per line)", { exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await page.getByRole("button", { name: "Play online", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Create private room" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Local game", exact: true }).click();
+  await page.locator("select.language").selectOption("zh");
+  await page.getByRole("button", { name: "开始本地对局 →" }).click();
+  await page.getByRole("button", { name: "查看我的回合 →" }).click();
+  await expect(page.locator('[data-city="Paris"]')).toContainText("巴黎");
+  await expect(page.locator('[data-city="London"]')).toHaveAttribute(
+    "aria-label",
+    /伦敦/,
+  );
+  await page.locator("select.language").selectOption("en");
+  await expect(page.locator('[data-city="Paris"]')).toContainText("Paris");
+  await expect(page.locator(".ticket-city-ribbon").first()).not.toContainText(
+    /[\u4e00-\u9fff]/,
+  );
 });

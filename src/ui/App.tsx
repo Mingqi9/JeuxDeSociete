@@ -1,3 +1,6 @@
+import { cityName } from "./cityNames";
+import { LanguageSelect } from "./LanguageSelect";
+import { readLanguage } from "./i18n";
 import { useEffect, useMemo, useState } from "react";
 import { createGame, transition, actionError } from "../domain/engine";
 import { scoreGame } from "../domain/scoring";
@@ -22,7 +25,7 @@ import { OnlineApp } from "./OnlineApp";
 import { onlineWords } from "./onlineWords";
 function initialLanguage(): Lang {
   try {
-    return localStorage.getItem("erc-language") === "fr" ? "fr" : "zh";
+    return readLanguage();
   } catch {
     return "zh";
   }
@@ -88,7 +91,7 @@ export function App({ initialGame }: { initialGame?: Game } = {}) {
     });
   }, [playerNames.length]);
   useEffect(() => {
-    document.documentElement.lang = lang === "zh" ? "zh-CN" : "fr";
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
     try {
       localStorage.setItem("erc-language", lang);
     } catch {
@@ -164,12 +167,7 @@ export function App({ initialGame }: { initialGame?: Game } = {}) {
         <div className="brand">
           ✦ EUROPA <span>RAIL CLUB</span>
         </div>
-        <button
-          className="language"
-          onClick={() => setLang(lang === "zh" ? "fr" : "zh")}
-        >
-          {lang === "zh" ? "FR Français" : "中 中文"}
-        </button>
+        <LanguageSelect lang={lang} onChange={setLang} />
       </header>
       <div className="mode-banner">{t.local}</div>
       {error && (
@@ -291,8 +289,9 @@ export function App({ initialGame }: { initialGame?: Game } = {}) {
                 .find((player) => player.id === row.id)!
                 .tickets.map((ticket) => (
                   <p key={ticket.id}>
-                    {row.completed.includes(ticket.id) ? "✓" : "✕"} {ticket.a} →{" "}
-                    {ticket.b} · {ticket.points}
+                    {row.completed.includes(ticket.id) ? "✓" : "✕"}{" "}
+                    {cityName(ticket.a, t)} → {cityName(ticket.b, t)} ·{" "}
+                    {ticket.points}
                   </p>
                 ))}
             </section>
@@ -365,7 +364,8 @@ export function App({ initialGame }: { initialGame?: Game } = {}) {
                   {preview && (
                     <div className="ticket-preview-status">
                       <span>
-                        {t.previewTicket}: {preview.a} → {preview.b}
+                        {t.previewTicket}: {cityName(preview.a, t)} →{" "}
+                        {cityName(preview.b, t)}
                       </span>
                       <button onClick={() => setPreview(null)}>
                         {t.clearPreview}

@@ -1,3 +1,4 @@
+import { cityName } from "./cityNames";
 import {
   routePoints,
   type Game,
@@ -84,7 +85,7 @@ export function GameActions({
         <div className="surface route-action">
           <h2>{t.route}</h2>
           <strong>
-            {r.a} → {r.b}
+            {cityName(r.a, t)} → {cityName(r.b, t)}
           </strong>
           {r && (
             <>
@@ -114,7 +115,7 @@ export function GameActions({
       {city && (
         <div className="surface station-action">
           <h2>{t.station}</h2>
-          <strong>{city}</strong>
+          <strong>{cityName(city, t)}</strong>
           <p>
             {t.pay}: {p.stations.length + 1}
           </p>

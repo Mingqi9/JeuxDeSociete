@@ -1,3 +1,6 @@
+import { cityName } from "./cityNames";
+import { LanguageSelect } from "./LanguageSelect";
+import { readLanguage } from "./i18n";
 import { useEffect, useState } from "react";
 import {
   type Action,
@@ -84,7 +87,7 @@ export function OnlineApp({ onLocal }: { onLocal: () => void }) {
   const net = useRoom();
   const [lang, setLang] = useState<Lang>(() => {
     try {
-      return localStorage.getItem("erc-language") === "fr" ? "fr" : "zh";
+      return readLanguage();
     } catch {
       return "zh";
     }
@@ -140,7 +143,7 @@ export function OnlineApp({ onLocal }: { onLocal: () => void }) {
     } catch {
       /* language storage is optional */
     }
-    document.documentElement.lang = lang === "zh" ? "zh-CN" : "fr";
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
   }, [lang]);
   const dispatch = (action: Action) => {
     if (enabled) net.command({ type: "action", action });
@@ -159,12 +162,7 @@ export function OnlineApp({ onLocal }: { onLocal: () => void }) {
         <div className="brand">
           ✦ EUROPA <span>RAIL CLUB</span>
         </div>
-        <button
-          className="language"
-          onClick={() => setLang(lang === "zh" ? "fr" : "zh")}
-        >
-          {lang === "zh" ? "FR Français" : "中 中文"}
-        </button>
+        <LanguageSelect lang={lang} onChange={setLang} />
       </header>
       <button className="sound-toggle" onClick={sound.toggle}>
         {sound.enabled ? n.soundOn : n.soundOff}
@@ -397,7 +395,7 @@ export function OnlineApp({ onLocal }: { onLocal: () => void }) {
               <>
                 {preview && (
                   <div className="ticket-preview-status">
-                    {preview.a} → {preview.b}
+                    {cityName(preview.a, t)} → {cityName(preview.b, t)}
                     <button onClick={() => setPreview(null)}>
                       {t.clearPreview}
                     </button>

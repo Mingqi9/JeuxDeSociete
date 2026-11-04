@@ -1,7 +1,7 @@
 # Europa Rail Club — Product Requirements (v1)
 
 ## Product goal
-Private, browser-based, real-time multiplayer railway board game for 2–5 friends, inspired by Ticket to Ride: Europe base game. Players share a room link, join with nicknames, and play full games on desktop or mobile. Interface languages: Simplified Chinese and French, independently switchable. No mandatory accounts, no bots, no monetization. Functional fidelity to base-game rules is the priority; visual assets must be original, not copied from the commercial game.
+Private, browser-based, real-time multiplayer railway board game for 2–5 friends, inspired by Ticket to Ride: Europe base game. Players share a room link, join with nicknames, and play full games on desktop or mobile. Interface languages: Simplified Chinese, French and English, independently switchable. No mandatory accounts, no bots, no monetization. Functional fidelity to base-game rules is the priority; visual assets must be original, not copied from the commercial game.
 
 ## User journeys
 1. Open website → choose language → enter nickname → create private room → copy invite link.
@@ -76,3 +76,7 @@ The active game fits the dynamic viewport without document scrolling. Use compac
 ## Trackpad and width revision - 2026-11-03
 
 Default map scale fills the available width, allowing vertical pan where needed. Support trackpad pinch (Ctrl-wheel browser events) with pointer-anchored zoom and native two-finger pan. Provide a translated fit-width reset. Ticket inspection still switches to a full-map overview.
+
+## Language expansion — 2026-11-04
+
+Support Chinese, French and English in both local and online screens, with a persisted language selector. Chinese mode displays Chinese city names on the map, ticket cards, endpoint previews and route/station details. Canonical city identifiers and game data remain unchanged.

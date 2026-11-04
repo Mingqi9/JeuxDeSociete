@@ -64,7 +64,7 @@ test("two independent browsers join, play privately, refresh and reconnect", asy
     ).toBeVisible();
     const hand = await friend.locator(".hand").textContent();
     await friend.locator('[data-city="Paris"]').press("Enter");
-    await expect(friend.locator(".map-caption")).toContainText("Paris");
+    await expect(friend.locator(".map-caption")).toContainText("巴黎");
     await expect(friend.getByRole("button", { name: "确认建站" })).toHaveCount(
       0,
     );

@@ -147,3 +147,9 @@ Validation: production build/typecheck and formatting passed. All 16 desktop/mob
 ## Trackpad and width revision - 2026-11-03
 
 Board defaults to width-fit, supports non-passive Ctrl-wheel pinch with pointer anchoring and 0.2x-5x limits, and preserves ordinary wheel panning. Added bilingual fit-width control and gesture hints. Ticket overview remains available. Ten targeted desktop/mobile browser cases reported success, including zoom in/out, anchoring, pan, width reset, viewport bounds, placement and privacy. Build/typecheck passed; physical trackpad hardware still needs user confirmation. Windows test runner manually stopped after cases completed during server cleanup.
+
+## Language expansion — 2026-11-04
+
+Added English local/online UI and error translations, a three-language selector and persisted English preference. Added Chinese names for all 47 Europe cities, shared by board labels, accessible targets, ticket cards, route/station details and endpoint previews. City IDs and rules are unchanged.
+
+Validation: production build/typecheck passed; 78 unit/rules/server tests passed. The first sandboxed run could not listen on a local port; the authorized rerun passed. Six desktop/mobile browser tests passed, covering existing local flow, French persistence, English persistence across local/online screens and Chinese map labels. Two additional desktop/mobile online browser regressions passed, including independent browsers, hidden hands, refresh and reconnect. They first caught an untranslated city-inspection caption; that caption was fixed before the successful rerun. Formatting check passed. Final build/typecheck also passed after the fix.

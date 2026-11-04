@@ -1,4 +1,5 @@
-export const dictionaries = {
+import { english } from "./english";
+const existing = {
   zh: {
     fitWidth: "铺满宽度",
     fitMap: "完整地图",
@@ -343,6 +344,22 @@ export const dictionaries = {
     },
   },
 };
+export const dictionaries = { ...existing, en: english } satisfies Record<
+  "zh" | "fr" | "en",
+  typeof existing.zh
+>;
 export type Lang = keyof typeof dictionaries;
 
-export type Words = typeof dictionaries.zh | typeof dictionaries.fr;
+export type Words = {
+  [K in keyof typeof existing.zh]: K extends "errors"
+    ? Record<keyof typeof existing.zh.errors, string>
+    : string;
+};
+export function readLanguage(): Lang {
+  try {
+    const value = localStorage.getItem("erc-language");
+    return value === "en" || value === "fr" ? value : "zh";
+  } catch {
+    return "zh";
+  }
+}

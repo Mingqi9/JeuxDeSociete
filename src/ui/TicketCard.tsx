@@ -1,3 +1,4 @@
+import { cityName } from "./cityNames";
 import type { Dataset, Ticket } from "../domain/model";
 import type { Words } from "./i18n";
 import { continentOutline } from "./BoardScenery";
@@ -32,7 +33,7 @@ export function TicketCard({
         {ticket.long ? t.longTicket : t.shortTicket}
       </span>
       <strong className="ticket-city-ribbon">
-        {ticket.a} <span>→</span> {ticket.b}
+        {cityName(ticket.a, t)} <span>→</span> {cityName(ticket.b, t)}
       </strong>
       <svg viewBox="0 0 200 100" aria-hidden="true">
         <g transform="translate(10 3) scale(.11 .085)">

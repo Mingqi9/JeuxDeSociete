@@ -1,3 +1,4 @@
+import { cityName } from "./cityNames";
 import {
   useEffect,
   useLayoutEffect,
@@ -47,6 +48,7 @@ export function Board({
   } | null>(null);
   const player = game.players[game.active];
   const [inspection, setInspection] = useState("");
+  useEffect(() => setInspection(""), [t.title]);
   const pan = useRef<{
     x: number;
     y: number;
@@ -58,12 +60,12 @@ export function Board({
   const chooseRoute = (id: string) => {
     const r = game.data.routes.find((r) => r.id === id)!;
     setInspection(
-      `${r.a} ? ${r.b} ? ${r.length} ? ${t[r.color]}${r.tunnel ? " ? " + t.tunnel : ""}${r.locomotives ? " ? ? " + r.locomotives : ""}`,
+      `${cityName(r.a, t)} ? ${cityName(r.b, t)} ? ${r.length} ? ${t[r.color]}${r.tunnel ? " ? " + t.tunnel : ""}${r.locomotives ? " ? ? " + r.locomotives : ""}`,
     );
     if (enabled) onSelect(id);
   };
   const chooseCity = (city: string) => {
-    setInspection(city);
+    setInspection(cityName(city, t));
     if (enabled) onSelectCity(city);
   };
   useEffect(() => {
@@ -376,7 +378,7 @@ export function Board({
                   role="button"
                   tabIndex={0}
                   aria-pressed={selected === r.id}
-                  aria-label={`${r.a} – ${r.b}, ${r.length}, ${t[r.color]}, ${owner?.name ?? t.unclaimed}`}
+                  aria-label={`${cityName(r.a, t)} – ${cityName(r.b, t)}, ${r.length}, ${t[r.color]}, ${owner?.name ?? t.unclaimed}`}
                   onClick={() => chooseRoute(r.id)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
@@ -469,11 +471,11 @@ export function Board({
               const owner = game.players.find((p) => p.stations.includes(city));
               return (
                 <g
-                  key={city}
+                  key={cityName(city, t)}
                   data-city={city}
                   role="button"
                   tabIndex={0}
-                  aria-label={`${t.station} · ${city}${owner ? ` · ${owner.name}` : ""}`}
+                  aria-label={`${t.station} · ${cityName(city, t)}${owner ? ` · ${owner.name}` : ""}`}
                   aria-pressed={selectedCity === city}
                   onClick={() => chooseCity(city)}
                   onKeyDown={(e) => {
@@ -528,7 +530,7 @@ export function Board({
                     />
                   )}
                   <text x={x} y={y + 28} textAnchor="middle">
-                    {city}
+                    {cityName(city, t)}
                   </text>
                 </g>
               );
@@ -539,7 +541,13 @@ export function Board({
                   [preview.a, preview.b].map((city, index) => {
                     const [x, y] = game.data.cities[city];
                     const unit = 1 / Math.max(mapScale, 0.05);
-                    const labelWidth = (city.length * 8 + 36) * unit;
+                    const labelWidth =
+                      (Array.from(cityName(city, t)).reduce(
+                        (n, c) => n + (c.charCodeAt(0) > 255 ? 14 : 8),
+                        0,
+                      ) +
+                        36) *
+                      unit;
                     const labelHeight = 28 * unit;
                     const radius = 18 * unit;
                     const labelX = Math.max(
@@ -558,7 +566,7 @@ export function Board({
                     );
                     return (
                       <g
-                        key={`${layer}-${city}`}
+                        key={`${layer}-${cityName(city, t)}`}
                         data-endpoint={layer === "labels" ? city : undefined}
                       >
                         {layer === "rings" && (
@@ -613,7 +621,7 @@ export function Board({
                               className="endpoint-name"
                               style={{ fontSize: 14 * unit }}
                             >
-                              {index + 1} · {city}
+                              {index + 1} · {cityName(city, t)}
                             </text>
                           </>
                         )}
@@ -669,7 +677,7 @@ export function Board({
         {preview && (
           <strong>
             {" "}
-            · {preview.a} → {preview.b}
+            · {cityName(preview.a, t)} → {cityName(preview.b, t)}
           </strong>
         )}
       </div>
