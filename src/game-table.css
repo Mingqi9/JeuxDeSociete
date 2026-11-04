@@ -1,0 +1,477 @@
+/* Independent in-game direction: original printed railway board and travel tickets.
+   Homepage styles deliberately remain in styles.css. No bitmap board textures. */
+.app:not(.landing-app) {
+  --rail-ink: #354a4c;
+  --rail-burgundy: #82462d;
+  --rail-brass: #b79152;
+  --rail-paper: #faf1da;
+  color: #493d2e;
+  background:
+    repeating-linear-gradient(3deg, #6d4e3410 0 1px, transparent 1px 7px),
+    radial-gradient(ellipse at 50% 25%, #f5e8cb, #cfba96);
+}
+.app:not(.landing-app) > header {
+  background: linear-gradient(110deg, #203e47, #365d62 55%, #1f3a44);
+  border-bottom: 3px double #d4b878;
+  box-shadow: 0 3px 8px #3c2d2025;
+}
+.app:not(.landing-app) .brand {
+  color: #f7e5b9;
+  text-shadow: 0 1px 1px #0a212a;
+  font-family: var(--rail-display);
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+.app:not(.landing-app) .brand span {
+  color: #d9c99d;
+}
+.app:not(.landing-app) .language {
+  width: auto;
+  margin: 0;
+  min-height: 32px;
+  padding: 5px 10px;
+  border: 1px solid #d2be8766;
+  background: #ffffff0d;
+  color: #fff1cb;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.app:not(.landing-app) .language option {
+  color: #3b3329;
+  background: #fff7e5;
+}
+.app:not(.landing-app) > .mode-banner {
+  background: #e5d4ad;
+  color: #685034;
+  border-bottom: 1px solid #bca16b;
+  font-size: 10px;
+}
+.app:not(.landing-app) :is(button, input, select, textarea) {
+  border-color: #b9a782;
+}
+.app:not(.landing-app)
+  button:not(.train-card):not(.card-back):not(.language):not(.primary) {
+  background-color: #f8efd9;
+  color: #58472e;
+  border-radius: 4px;
+}
+.app:not(.landing-app)
+  button:hover:enabled:not(.train-card):not(.card-back):not(.primary):not(
+    .language
+  ) {
+  background-color: #eddfbd;
+}
+.app:not(.landing-app) .primary {
+  color: #fff5d6;
+  background: linear-gradient(#32606a, #234952);
+  border: 1px solid #193d48;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 0 1px #ffffff24,
+    0 2px 3px #3d2d1f20;
+}
+.app:not(.landing-app) .primary:hover:enabled {
+  background: linear-gradient(#3e717a, #2b5660);
+}
+.app:not(.landing-app) :is(button, input, select, summary):focus-visible {
+  outline-color: #a75d2f;
+}
+.app:not(.landing-app) input[type="checkbox"],
+.app:not(.landing-app) input[type="range"] {
+  accent-color: #2d6269;
+}
+.app:not(.landing-app)
+  :is(.surface, .panel, .scoring-help, .table-left .actions-tray) {
+  background:
+    repeating-linear-gradient(120deg, #7a5b2704 0 1px, transparent 1px 5px),
+    linear-gradient(125deg, #fff9e9, #f0e3c5);
+  border: 1px solid #b7a17a;
+  border-radius: 5px;
+  box-shadow:
+    inset 0 0 0 3px #fff9e7,
+    0 3px 8px #45331b15;
+}
+.app:not(.landing-app) .table-left .actions-tray > .surface {
+  background: none;
+  box-shadow: none;
+  border: 0;
+}
+.app:not(.landing-app) :is(h1, h2, h3) {
+  color: #80462f;
+  font-family: var(--rail-display);
+}
+.app:not(.landing-app)
+  :is(small, .own-hand p, .market-hint, .supply-counts, .finish-options) {
+  color: #756044;
+}
+.app:not(.landing-app) .turnbar {
+  border: 1px solid #345862;
+  border-top: 2px solid #d7bb7b;
+  border-bottom: 2px solid #b99657;
+  border-radius: 4px;
+  background: linear-gradient(105deg, #284e58, #3a6870);
+  box-shadow:
+    inset 0 0 0 1px #f5e5b721,
+    0 2px 5px #342c201f;
+}
+.app:not(.landing-app) .turnbar strong {
+  color: #fff0c8;
+}
+.app:not(.landing-app) .player-supply {
+  background: linear-gradient(120deg, #fffaeb, #eaddbf);
+  border-color: #bda67b;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 2px #fff7e0;
+}
+.app:not(.landing-app) .player-supply.active {
+  border-color: var(--piece);
+  box-shadow:
+    inset 0 3px 0 var(--piece),
+    inset 0 0 0 2px #fff7e0;
+}
+.app:not(.landing-app) .count-pill {
+  background: #e0d1ad;
+  color: #5e492c;
+  border: 1px solid #bca471;
+  border-radius: 4px;
+}
+.app:not(.landing-app) :is(.deal-banner, .deal-complete) {
+  border: 1px solid #b69b62;
+  border-left: 4px solid #a67139;
+  background: linear-gradient(105deg, #ead6a6, #f5e9cb);
+  border-radius: 4px;
+  color: #5d482b;
+}
+.app:not(.landing-app) .map-panel {
+  border: 3px solid #a37c45;
+  border-radius: 6px;
+  background: #c0d5d9;
+  box-shadow:
+    0 2px 0 #f3deb2,
+    0 5px 15px #3c2d2538;
+}
+.app:not(.landing-app) :is(.map-tools, .map-placement) {
+  background: linear-gradient(#f9edd1, #dfc99d);
+  border-color: #b49159;
+  color: #644b2e;
+}
+.app:not(.landing-app) .map-caption {
+  background: #e9dab9;
+  border-color: #b69c68;
+  color: #665235;
+}
+.app:not(.landing-app) .placement-piece[aria-pressed="true"] {
+  background: #e6d4a9;
+  outline-color: #9f753c;
+}
+.app:not(.landing-app) .scoring-help summary {
+  color: #735031;
+}
+.app:not(.landing-app) .express-card {
+  border-color: #f8eace;
+  outline-color: #aa8849;
+  background: radial-gradient(ellipse at 50% 20%, #f9efd6, #d9c69b);
+  box-shadow: 2px 3px 0 #b8a077;
+}
+.app:not(.landing-app) .route-guide {
+  color: #6b5537;
+}
+.app:not(.landing-app) .card-back {
+  border: 4px solid #f6e8c8;
+  outline: 1px solid #9f7e42;
+  border-radius: 4px;
+  background:
+    repeating-linear-gradient(45deg, #e3c78a10 0 1px, transparent 1px 5px),
+    radial-gradient(ellipse at 45% 35%, #416f77, #1e414e);
+  box-shadow:
+    2px 3px 0 #b59d71,
+    4px 5px 0 #decba3;
+}
+.app:not(.landing-app) .card-back:hover:enabled {
+  background-color: #355e67;
+  filter: brightness(1.12);
+}
+.app:not(.landing-app) .card-back::before {
+  border-color: #d3b673;
+  border-radius: 3px;
+}
+.app:not(.landing-app) .card-back strong {
+  color: #f9e8bc;
+}
+.app:not(.landing-app) .train-card {
+  border-color: #a88b54;
+  background: #fbefd4;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 0 1px #fff9e8,
+    1px 3px 3px #4d3c2630;
+}
+.app:not(.landing-app) .train-card.chosen {
+  outline-color: #a8612e;
+  box-shadow: 0 5px 8px #593c2638;
+}
+.app:not(.landing-app) .card-drag-handle {
+  background: #decca2;
+  color: #68502e;
+}
+.app:not(.landing-app) .ticket-card {
+  --ticket-ink: #4d6e54;
+  --ticket-paper: #e8ecd2;
+  border-color: #a38e61;
+  border-radius: 4px;
+  background: var(--ticket-paper);
+  color: var(--ticket-ink);
+}
+.app:not(.landing-app) .short-ticket {
+  --ticket-ink: #3b6573;
+  --ticket-paper: #dce8e6;
+}
+.app:not(.landing-app) .ticket-card .ticket-face {
+  background: linear-gradient(120deg, #fff8e940, #b89e5920);
+}
+.app:not(.landing-app) .ticket-city-ribbon {
+  background: var(--ticket-ink);
+  color: #fff5d9;
+  border-block: 1px solid #a99054;
+  font-family: var(--rail-display);
+}
+.app:not(.landing-app) .ticket-kind {
+  color: var(--ticket-ink);
+}
+.app:not(.landing-app) .ticket-value {
+  color: #fbefca;
+  background: var(--ticket-ink);
+  border-color: #bd9a52;
+}
+.app:not(.landing-app) .ticket-locate {
+  background: #fff7df70;
+  border-color: #b59c6738;
+  color: var(--ticket-ink);
+}
+.app:not(.landing-app) .ticket-card.kept {
+  outline-color: #4b7058;
+}
+.app:not(.landing-app) .ticket-card.previewing {
+  box-shadow: 0 0 0 2px #aa692e;
+}
+.app:not(.landing-app) .ticket-continent {
+  fill: #c8c7a7;
+  stroke: #8d825c;
+}
+.app:not(.landing-app) .ticket-route-line {
+  stroke: #ab6b2d;
+}
+.app:not(.landing-app) .discard-stack {
+  border-color: #b19a6d;
+  background: #e5d6b550;
+}
+.app:not(.landing-app) .handoff-cover {
+  background: #e5d8b9ed;
+  backdrop-filter: blur(7px);
+}
+.app:not(.landing-app) .handoff {
+  border: 4px double #b19358;
+  box-shadow:
+    inset 0 0 0 6px #fff6df,
+    0 16px 60px #45352638;
+}
+.app:not(.landing-app) .result {
+  border-left: 4px solid #577b7d;
+}
+.app:not(.landing-app) .result:first-of-type {
+  border-color: #b68a3d;
+  background: linear-gradient(125deg, #fff6d9, #e6d3a5);
+}
+.app:not(.landing-app) .result h2 {
+  border-bottom: 1px solid #b49c6b77;
+  padding-bottom: 14px;
+}
+.app:not(.landing-app) .result dd {
+  font-family: var(--rail-display);
+  color: #305860;
+}
+.app:not(.landing-app) .hero > h1,
+.app:not(.landing-app) .results > h1 {
+  text-shadow: 0 1px #fff7de;
+}
+.app:not(.landing-app) .lobby-seats {
+  list-style: decimal-leading-zero;
+  padding-left: 36px;
+}
+.app:not(.landing-app) .lobby-seats li {
+  padding: 8px 4px;
+  border-bottom: 1px solid #bba67966;
+}
+
+/* SVG board print layers. These never receive input; city/route targets remain live. */
+.map-panel .board-frame {
+  fill: var(--atlas-frame, #9e7d4e);
+  stroke: #6b563c;
+  stroke-width: 3;
+}
+.map-panel .board-inlay {
+  fill: none;
+  stroke: #f6e2b8;
+  stroke-width: 4;
+}
+.map-panel .map-paper {
+  fill: var(--atlas-sea, #c0d5d9);
+  stroke: #6c8a8b;
+  stroke-width: 2;
+}
+.map-panel .score-cell {
+  fill: #285361;
+  stroke: #d1ba85;
+  stroke-width: 2;
+}
+.map-panel .score-cell.major {
+  fill: #d6bc7f;
+  stroke: #f5e4b8;
+}
+.map-panel .score-track text {
+  fill: #f7e9c9;
+  font-family: var(--rail-display);
+  font-weight: 400;
+}
+.map-panel .score-track .major ~ text {
+  fill: #68462a;
+  font-weight: 700;
+}
+.map-panel .score-cell-ornament {
+  fill: none;
+  stroke: #f5e0aa;
+  stroke-width: 1;
+}
+.map-panel .map-decoration .atlas-land {
+  fill: var(--atlas-land, #eddfbf);
+  stroke: #9d7a4d;
+  stroke-width: 3.2;
+  stroke-linejoin: round;
+}
+.map-panel .map-decoration .atlas-regions path {
+  fill: #c49d67;
+  opacity: 0.12;
+}
+.map-panel .map-decoration .atlas-regions path:nth-child(2) {
+  fill: #768b70;
+  opacity: 0.1;
+}
+.map-panel .map-decoration .atlas-regions path:nth-child(3) {
+  fill: #b57951;
+  opacity: 0.1;
+}
+.map-panel .map-decoration .atlas-regions path:nth-child(4) {
+  fill: #c79a62;
+  opacity: 0.12;
+}
+.map-panel .map-decoration .atlas-grid path {
+  stroke: #789394;
+  opacity: 0.22;
+  stroke-dasharray: 1 12;
+}
+.map-panel .map-decoration .atlas-borders path {
+  fill: none;
+  stroke: #a88a59;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 5;
+  opacity: 0.65;
+}
+.map-panel .map-decoration .atlas-rivers path {
+  fill: none;
+  stroke: #6e9ea9;
+  stroke-width: 2;
+  opacity: 0.4;
+}
+.map-panel .map-decoration .atlas-relief path {
+  fill: #9b7c5230;
+  stroke: #8f704c;
+  stroke-width: 1;
+  opacity: 0.42;
+}
+.map-panel .map-decoration .atlas-vignettes path {
+  fill: #406c7b20;
+  stroke: #426b78;
+  stroke-width: 1.4;
+  opacity: 0.5;
+}
+.map-panel .map-decoration .atlas-wordmark {
+  fill: #826344;
+  font-size: 18px;
+  letter-spacing: 5px;
+}
+.map-panel .atlas-grain {
+  opacity: 0.8;
+}
+.map-panel .city-halo {
+  fill: #d1944930;
+  stroke: #a97c4f70;
+  stroke-width: 1;
+}
+.map-panel .city-medallion {
+  fill: #f7e4b8;
+  stroke: #8f663e;
+  stroke-width: 2;
+}
+.map-panel .city-core {
+  fill: var(--atlas-city, #e6a642);
+  stroke: #bb8843;
+  stroke-width: 1;
+}
+.map-panel .city-name {
+  fill: #76422e;
+  stroke: #fcf1d8;
+  stroke-width: 4px;
+  font: 700 19px var(--rail-display);
+}
+.map-panel .route-bed {
+  opacity: 0.55;
+}
+.map-panel [data-route][aria-pressed="true"] .route-bed {
+  opacity: 1;
+}
+.map-panel .route-segment {
+  paint-order: stroke;
+  filter: drop-shadow(0 1px 0 #644e3880);
+}
+.map-panel .tunnel-sleeve {
+  fill: #3c4341;
+  stroke: #d4c497;
+  stroke-width: 1;
+}
+.map-panel .route-stamp {
+  fill: #273d45;
+  stroke: none;
+  font:
+    700 11px Georgia,
+    serif;
+  opacity: 0.65;
+}
+.map-panel .track-glint {
+  fill: none;
+  stroke: #fff8d6;
+  stroke-width: 1.2;
+  opacity: 0.6;
+}
+.map-panel .ferry-stamp {
+  fill: #273d45;
+  stroke: none;
+}
+.map-panel [data-route][data-owner] .route-bed {
+  opacity: 1;
+}
+.map-panel .destination-beacons {
+  filter: drop-shadow(0 2px 2px #50351f50);
+}
+
+.map-panel [data-color="black"] .route-stamp,
+.map-panel [data-color="blue"] .route-stamp {
+  fill: #fff1ca;
+  opacity: 0.8;
+}
+
+.map-panel .map-decoration .atlas-shoreline {
+  fill: none;
+  stroke: #718b8790;
+  stroke-width: 9;
+  stroke-linejoin: round;
+}

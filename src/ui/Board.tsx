@@ -1,5 +1,7 @@
+import { BoardFinish } from "./BoardFinish";
 import { cityName } from "./cityNames";
 import {
+  useId,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -32,6 +34,7 @@ export function Board({
   onSelectCity: (city: string) => void;
   enabled: boolean;
 }) {
+  const finishId = "atlas-" + useId().replace(/:/g, "");
   const [zoom, setZoom] = useState(1);
   const zoomRef = useRef(1);
   const zoomAnchor = useRef<{
@@ -307,9 +310,18 @@ export function Board({
           width={w * mapScale}
           height={h * mapScale}
           viewBox={`0 0 ${w} ${h}`}
+          style={
+            {
+              "--atlas-sea": `url(#${finishId}-sea)`,
+              "--atlas-land": `url(#${finishId}-land)`,
+              "--atlas-city": `url(#${finishId}-city)`,
+              "--atlas-frame": `url(#${finishId}-frame)`,
+            } as CSSProperties
+          }
           role="group"
           aria-label={t.fixture}
         >
+          <BoardFinish id={finishId} />
           <rect
             className="board-frame"
             x="1"
@@ -326,6 +338,15 @@ export function Board({
             height={h - 112}
             rx="12"
           />
+          <rect
+            className="board-inlay"
+            x="49"
+            y="49"
+            width={w - 98}
+            height={h - 98}
+            rx="14"
+            pointerEvents="none"
+          />
           <g className="score-track" aria-label={t.scoreTrack}>
             {Array.from({ length: 100 }, (_, n) => {
               const pos = scoreTrackPosition(n, w, h);
@@ -336,8 +357,13 @@ export function Board({
                     y="-21"
                     width="42"
                     height="42"
-                    rx="5"
+                    rx="19"
                     className={n % 5 === 0 ? "score-cell major" : "score-cell"}
+                  />
+                  <path
+                    className="score-cell-ornament"
+                    d="M-17 -17l4 -3m26 0l4 3M-17 17l4 3m26 0l4 -3"
+                    pointerEvents="none"
                   />
                   <text textAnchor="middle" dy="7">
                     {n}
@@ -351,6 +377,13 @@ export function Board({
               width={mapW}
               height={mapH}
               full={Object.keys(game.data.cities).length > 10}
+            />
+            <rect
+              className="atlas-grain"
+              width={mapW}
+              height={mapH}
+              fill={`url(#${finishId}-grain)`}
+              pointerEvents="none"
             />
             {game.data.routes.map((r) => {
               const [x1, y1] = game.data.cities[r.a],
@@ -374,6 +407,7 @@ export function Board({
                 <g
                   key={r.id}
                   data-route={r.id}
+                  data-color={r.color}
                   data-owner={owner?.id}
                   role="button"
                   tabIndex={0}
@@ -388,6 +422,7 @@ export function Board({
                   }}
                 >
                   <line
+                    className="route-bed"
                     x1={x1 + dx}
                     y1={y1 + dy}
                     x2={x2 + dx}
@@ -407,11 +442,18 @@ export function Board({
                   >
                     {Array.from({ length: r.length }, (_, i) => (
                       <g key={i}>
+                        {r.tunnel && !owner && (
+                          <path
+                            className="tunnel-sleeve"
+                            d={`M${(distance / r.length) * i + 1} -6l5 -6h${Math.max(4, distance / r.length - 13)}l5 6v12l-5 6h-${Math.max(4, distance / r.length - 13)}l-5 -6Z`}
+                          />
+                        )}
                         <rect
+                          className="route-segment"
                           x={(distance / r.length) * i + 5}
-                          y={owner ? -11 : -7}
+                          y={owner ? -11 : -9}
                           width={Math.max(8, distance / r.length - 10)}
-                          height={owner ? 22 : 14}
+                          height={owner ? 22 : 18}
                           rx={owner ? 4 : 2}
                           fill={
                             owner
@@ -426,6 +468,45 @@ export function Board({
                           }
                           strokeWidth={owner ? 2.5 : r.tunnel ? 3 : 1}
                         />
+                        {!owner && (
+                          <g
+                            className="track-print"
+                            pointerEvents="none"
+                            transform={`translate(${(distance / r.length) * (i + 0.5)} 0)`}
+                          >
+                            <path
+                              className="track-glint"
+                              d={`M${-Math.max(3, distance / r.length / 2 - 9)} -6h${Math.max(4, distance / r.length - 18)}`}
+                            />
+                            {i < (r.locomotives ?? 0) ? (
+                              <g className="ferry-stamp">
+                                <path d="M-6 2h12v3h-12Zm2 -6h3v6h-3Zm3 2h5v4h-5Zm5 -2h3v6h-3Z" />
+                                <circle cx="-3" cy="5" r="1.8" />
+                                <circle cx="4" cy="5" r="1.8" />
+                              </g>
+                            ) : (
+                              <text
+                                className="route-stamp"
+                                textAnchor="middle"
+                                dy="3"
+                              >
+                                {
+                                  {
+                                    red: "○",
+                                    blue: "◇",
+                                    green: "×",
+                                    yellow: "✧",
+                                    orange: "⊙",
+                                    purple: "△",
+                                    white: "+",
+                                    black: "◆",
+                                    gray: "·",
+                                  }[r.color]
+                                }
+                              </text>
+                            )}
+                          </g>
+                        )}
                         {owner && (
                           <g
                             className="claimed-wagon-detail"
@@ -514,12 +595,25 @@ export function Board({
                     />
                   )}
                   <circle
+                    className="city-halo"
+                    cx={x}
+                    cy={y}
+                    r="16"
+                    pointerEvents="none"
+                  />
+                  <circle
+                    className="city-medallion"
+                    cx={x}
+                    cy={y}
+                    r="11"
+                    pointerEvents="none"
+                  />
+                  <circle
+                    className="city-core"
                     cx={x}
                     cy={y}
                     r="8"
-                    fill="#fff9ed"
-                    stroke="#344c50"
-                    strokeWidth="3"
+                    pointerEvents="none"
                   />
                   {owner && (
                     <path
@@ -529,7 +623,12 @@ export function Board({
                       strokeWidth="2"
                     />
                   )}
-                  <text x={x} y={y + 28} textAnchor="middle">
+                  <text
+                    className="city-name"
+                    x={x}
+                    y={y + 31}
+                    textAnchor="middle"
+                  >
                     {cityName(city, t)}
                   </text>
                 </g>

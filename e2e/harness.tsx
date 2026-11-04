@@ -6,6 +6,7 @@ import { App } from "../src/ui/App";
 import { createGame } from "../src/domain/engine";
 import { europe } from "../src/data/europe";
 import "../src/styles.css";
+import "../src/game-table.css";
 const params = new URLSearchParams(location.search);
 const players = Math.max(2, Math.min(5, Number(params.get("players") ?? 2)));
 const seed = Number(params.get("seed") ?? 124);

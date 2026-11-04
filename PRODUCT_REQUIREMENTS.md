@@ -84,3 +84,7 @@ Support Chinese, French and English in both local and online screens, with a per
 ## Homepage revision — 2026-11-04
 
 Follow the product owner's supplied mockup and three supplied images: purple illustrated hero with box, wordmark, language selector and game facts. The lower desktop/mobile layout has a fixed left vertical directory and an independently scrolling right panel. Sections: remote play (separate create/join tabs), trilingual publisher rulebooks, introduction, and retained local mode. Private invite links open the join form. Keep real admission, errors, keyboard access and independent language preferences. Supplied publisher homepage assets are an explicit exception to the original-art policy for this requested homepage; game board and card art remain original.
+
+## Independent game-board DA — 2026-11-04
+
+Product-owner clarification: the in-game experience must use its own vintage railway-board style rather than the homepage's plum UI. Draw the playable map with original SVG/CSS parchment, pale seas, brass score border, amber city nodes and printed track segments inspired by the supplied reference. Do not replace it with an image or trace the reference. Retain existing city/route identities, rule data and all drag/touch/keyboard, map zoom/pan, station, private task-preview and scoring interactions. Keep green long/blue short tickets and semantic player/train-card colors. Apply matching travel-card chrome to game screens; keep homepage styling independent.
